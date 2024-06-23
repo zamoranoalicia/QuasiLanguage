@@ -5,7 +5,7 @@ module AST(
           , Term (..)
           , Factor (..)
           , Var(..)
-          , TypeVar (..)
+          , TypeVar (INTEGER, REAL)
           , Declaration (QSDeclaration)
           , Block (QSBlock)
           , CompoundStatement (CompStatement)

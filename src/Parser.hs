@@ -26,6 +26,7 @@ import Text.Parsec
 import Text.Parsec.Token
 import Text.Parsec.Language
 import qualified Text.Parsec.Token as P
+import qualified SymbolTable as ST
 
 parseCompoundStatement :: Parser CompoundStatement
 parseCompoundStatement = CompStatement <$> (string "BEGIN"     *>

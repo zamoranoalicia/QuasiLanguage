@@ -26,8 +26,10 @@ source-repository head
 library
   exposed-modules:
       AST
+      Interpreter
       Lib
       Parser
+      SymbolTable
   other-modules:
       Paths_QuasiLanguage
   autogen-modules:
@@ -37,6 +39,7 @@ library
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       base >=4.7 && <5
+    , containers
     , parsec
     , parsec-numbers
   default-language: Haskell2010
@@ -53,6 +56,7 @@ executable QuasiLanguage-exe
   build-depends:
       QuasiLanguage
     , base >=4.7 && <5
+    , containers
     , parsec
     , parsec-numbers
   default-language: Haskell2010
@@ -70,6 +74,7 @@ test-suite QuasiLanguage-test
   build-depends:
       QuasiLanguage
     , base >=4.7 && <5
+    , containers
     , parsec
     , parsec-numbers
   default-language: Haskell2010
