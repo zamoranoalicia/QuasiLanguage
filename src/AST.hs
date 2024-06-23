@@ -1,20 +1,27 @@
 module AST(
             Statement(..)
-          , Identifier
+          , Identifier (..)
           , Expression (..)
           , Term (..)
           , Factor (..)
+          , Var(..)
+          , TypeVar (..)
+          , Declaration (QSDeclaration)
+          , Block (QSBlock)
+          , CompoundStatement (CompStatement)
+          , Program (QSProgram)
           ) where
 
-data Program = Program  Identifier CompoundStatement deriving (Show, Eq)
+data Program = QSProgram Identifier Block deriving (Show, Eq)
 
-data Block = Block Declaration CompoundStatement deriving (Show, Eq)
+data Block = QSBlock Declaration CompoundStatement deriving (Show, Eq)
 
-data Declaration = Declaration Var deriving (Show, Eq)
+data Declaration = QSDeclaration [Var] deriving (Show, Eq)
 
 data Var = Var [Identifier] TypeVar deriving (Show, Eq)
 
-data TypeVar = INTERGER | REAL deriving (Show, Eq)
+data TypeVar = INTEGER |
+               REAL deriving (Show, Eq)
 
 data CompoundStatement = CompStatement [Statement] deriving (Show, Eq)
 
@@ -34,6 +41,6 @@ data Term = Div Factor Factor
 
 data Factor = Value Int deriving (Show, Eq)
 
-type Identifier = String
+data Identifier = Identifier String deriving (Show, Eq)
 
 
