@@ -10,3 +10,6 @@ BEGIN
     abc  := 3+4;
     cdf  := 5+6; 
 END.
+BEGIN
+    xy := 123+123;
+END.

@@ -26,9 +26,9 @@ source-repository head
 library
   exposed-modules:
       AST
-      Interpreter
       Lib
       Parser
+      SemanticAnalyzer
       SymbolTable
   other-modules:
       Paths_QuasiLanguage

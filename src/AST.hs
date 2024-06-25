@@ -1,46 +1,63 @@
-module AST(
-            Statement(..)
-          , Identifier (..)
-          , Expression (..)
-          , Term (..)
-          , Factor (..)
-          , Var(..)
-          , TypeVar (INTEGER, REAL)
-          , Declaration (QSDeclaration)
-          , Block (QSBlock)
-          , CompoundStatement (CompStatement)
-          , Program (QSProgram)
-          ) where
+module AST (
+    Program(..)
+  , Block(..)
+  , Declaration(..)
+  , Var(..)
+  , TypeVar(..)
+  , CompoundStatement(..)
+  , Statement(..)
+  , Expression(..)
+  , Term(..)
+  , Factor(..)
+  , Identifier(..)
+) where
 
-data Program = QSProgram Identifier Block deriving (Show, Eq)
+-- | Represents an entire program.
+data Program = Program Identifier Block
+    deriving (Show, Eq)
 
-data Block = QSBlock Declaration CompoundStatement deriving (Show, Eq)
+-- | Represents a block of declarations and compound statements.
+data Block = Block Declaration [CompoundStatement]
+    deriving (Show, Eq)
 
-data Declaration = QSDeclaration [Var] deriving (Show, Eq)
+-- | Represents a declaration consisting of a list of variables.
+data Declaration = Declaration [Var]
+    deriving (Show, Eq)
 
-data Var = Var [Identifier] TypeVar deriving (Show, Eq)
+-- | Represents a variable with a list of identifiers and a type.
+data Var = Var [Identifier] TypeVar
+    deriving (Show, Eq)
 
-data TypeVar = INTEGER |
-               REAL deriving (Show, Eq)
+-- | Represents the type of a variable, which can be INTEGER or REAL.
+data TypeVar = INTEGER
+             | REAL
+    deriving (Show, Eq)
 
-data CompoundStatement = CompStatement [Statement] deriving (Show, Eq)
+-- | Represents a compound statement consisting of a list of statements.
+data CompoundStatement = CompoundStatement [Statement]
+    deriving (Show, Eq)
 
-data Statement = Assign String Expression
+-- | Represents a statement, which can be an assignment or an empty statement.
+data Statement = Assign Identifier Expression
                | EmptyStatement
-               deriving (Show, Eq)
+    deriving (Show, Eq)
 
+-- | Represents an expression, which can be an addition, subtraction, or a term.
 data Expression = Plus Term Term
                 | Minus Term Term
                 | ETerm Term
-                deriving (Show, Eq)
+    deriving (Show, Eq)
 
+-- | Represents a term, which can be a division, multiplication, or a factor.
 data Term = Div Factor Factor
           | Mul Factor Factor
           | TermFactor Factor
-          deriving (Show, Eq)
+    deriving (Show, Eq)
 
-data Factor = Value Int deriving (Show, Eq)
+-- | Represents a factor, which is a value.
+data Factor = Value Int
+    deriving (Show, Eq)
 
-data Identifier = Identifier String deriving (Show, Eq)
-
-
+-- | Represents an identifier.
+data Identifier = Identifier String
+    deriving (Show, Eq)

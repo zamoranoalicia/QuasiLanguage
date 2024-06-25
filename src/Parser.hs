@@ -1,110 +1,121 @@
-module Parser(parseStatement
-            , parseExpression
-            , whiteSpace
-            , lexer
-            , opLetter
-            , languageDef
-            , dotParse
-            , parseCompoundStatement
-            , parseAssigment
-            , parseStatements
-            , parseNewLine
-            , parseAssignSymbol
-            , qlIdentifier
-            , parseType
-            , parseIdentifiers
-            , parseIdentifier
-            , parseVar
-            , parseVariables
-            , parseDeclaration
-            , parseBlock
-            , parseProgram) where
+module Parser (
+    parseStatement
+  , parseExpression
+  , qsWhiteSpace
+  , lexer
+  , opLetter
+  , languageDef
+  , dotParse
+  , parseCompoundStatement
+  , parseAssignment
+  , parseStatements
+  , parseNewLine
+  , parseAssignSymbol
+  , qlIdentifier
+  , parseType
+  , parseIdentifiers
+  , parseIdentifier
+  , parseVar
+  , parseVariables
+  , parseDeclaration
+  , parseBlock
+  , parseProgram
+) where
 
-import AST as AST
-import Text.Parsec.String
+import AST
 import Text.Parsec
+import Text.Parsec.String
 import Text.Parsec.Token
-import Text.Parsec.Language
+import Text.Parsec.Language (emptyDef)
 import qualified Text.Parsec.Token as P
-import qualified SymbolTable as ST
 
-parseCompoundStatement :: Parser CompoundStatement
-parseCompoundStatement = CompStatement <$> (string "BEGIN"     *>
-                                           (whiteSpace lexer)  *>
-                                           parseStatements     <*
-                                           string "END"        <*
-                                           (char '.'))
-
-parseStatements :: Parser [Statement]
-parseStatements = ((parseStatement) `sepEndBy` (whiteSpace lexer))
-
-parseStatement :: Parser Statement
-parseStatement =  (try parseAssigment) <|>
-                  (try parseEmpty)
-
-parseNewLine :: Parser Char
-parseNewLine = (char '\n') <|>
-               (char '\r') <|>
-               (char '\t')
-
-
-parseEmpty :: Parser Statement
-parseEmpty = EmptyStatement <$ (parseNewLine)
-
-parseAssigment :: Parser Statement
-parseAssigment = Assign <$> (qlIdentifier        <*
-                            parseAssignSymbol    <*
-                            (whiteSpace lexer))  <*>
-                            parseExpression
-
-
-parseAssignSymbol :: Parser Char
-parseAssignSymbol = char ':' <*
-                    char '='
-
+-- Language definition for the lexer
 languageDef :: LanguageDef st
 languageDef = emptyDef
-  { commentStart    = "/*"
-  , commentEnd      = "*/"
-  , commentLine     = "//"
-  , nestedComments  = True
-  , identStart      = letter
-  , identLetter     = alphaNum <|> oneOf "_'"
-  , opStart         = opLetter emptyDef
-  , opLetter        = oneOf ":!#$%&*+./<=>?@\\^|-~"
-  , reservedNames   = ["BEGIN", "END", "VAR", "BLOCK"]
-  , reservedOpNames = ["+", "-", "*", "/", ":=", "==", "<", ">", "<=", ">="]
-  , caseSensitive   = True
-  }
+    { commentStart    = "/*"
+    , commentEnd      = "*/"
+    , commentLine     = "//"
+    , nestedComments  = True
+    , identStart      = letter
+    , identLetter     = alphaNum <|> oneOf "_'"
+    , opStart         = opLetter emptyDef
+    , opLetter        = oneOf ":!#$%&*+./<=>?@\\^|-~"
+    , reservedNames   = ["BEGIN"
+                         , "END"
+                         , "VAR"
+                         , "BLOCK"
+                         , "PROGRAM"
+                         , "INTEGER"
+                         , "REAL"]
+    , reservedOpNames = ["+", "-", "*", "/", ":="
+                         , "==", "<", ">", "<=", ">="]
+    , caseSensitive   = True
+    }
 
 lexer :: TokenParser st
 lexer = makeTokenParser languageDef
 
+qsWhiteSpace :: Parser ()
+qsWhiteSpace = P.whiteSpace lexer
+
+qlIdentifier :: Parser String
 qlIdentifier = P.identifier lexer
 
 dotParse :: Parser Char
-dotParse = (char '.')
+dotParse = char '.'
 
 semicolon :: Parser Char
-semicolon = (char ';')
+semicolon = char ';'
 
+-- Parsing compound statements
+parseCompoundStatement :: Parser CompoundStatement
+parseCompoundStatement = CompoundStatement <$>
+    (string "BEGIN"  *>
+     qsWhiteSpace    *>
+     parseStatements <*
+     string "END"    <*
+     dotParse)
+
+parseStatements :: Parser [Statement]
+parseStatements = parseStatement `sepEndBy` qsWhiteSpace
+
+parseStatement :: Parser Statement
+parseStatement = try parseAssignment <|> parseEmpty
+
+-- Parsing empty statements (new lines)
+parseNewLine :: Parser Char
+parseNewLine = char '\n' <|> char '\r' <|> char '\t'
+
+parseEmpty :: Parser Statement
+parseEmpty = EmptyStatement <$ parseNewLine
+
+-- Parsing assignment statements
+parseAssignment :: Parser Statement
+parseAssignment = Assign <$> (parseIdentifier   <*
+                              parseAssignSymbol <*
+                              qsWhiteSpace)<*>parseExpression
+
+parseAssignSymbol :: Parser String
+parseAssignSymbol = string ":="
+
+-- Parsing expressions
 parseExpression :: Parser Expression
-parseExpression  = parseOperation <* semicolon
+parseExpression = parseOperation <* semicolon
 
 parseOperation :: Parser Expression
 parseOperation = parsePlus
 
 parsePlus :: Parser Expression
-parsePlus = AST.Plus <$> (parseTermFactor    <*
-                         parsePlusSign       <*
-                         (whiteSpace lexer)) <*>
-                         parseTermFactor
+parsePlus = Plus <$> (parseTermFactor <*
+                      parsePlusSign   <*
+                      qsWhiteSpace)   <*> parseTermFactor
 
 parsePlusSign :: Parser Char
 parsePlusSign = char '+'
 
+-- Parsing terms and factors
 parseTermFactor :: Parser Term
-parseTermFactor = AST.TermFactor <$> parseFactor
+parseTermFactor = TermFactor <$> parseFactor
 
 parseFactor :: Parser Factor
 parseFactor = Value <$> parseDigit
@@ -112,41 +123,46 @@ parseFactor = Value <$> parseDigit
 parseDigit :: Parser Int
 parseDigit = read <$> many1 digit
 
-parseType :: Parser AST.TypeVar
-parseType = ((AST.INTEGER <$ string "INTEGER") <|>
-             (AST.REAL <$ string "REAL"))
+-- Parsing types
+parseType :: Parser TypeVar
+parseType = (INTEGER <$ string "INTEGER") <|>
+            (REAL <$ string "REAL")
 
+-- Parsing identifiers
 parseIdentifier :: Parser Identifier
-parseIdentifier = (Identifier <$> qlIdentifier)
+parseIdentifier = Identifier <$> qlIdentifier
 
 parseIdentifiers :: Parser [Identifier]
-parseIdentifiers = ((many space) *> 
-                  parseIdentifier <*
-                  (many space)) `sepBy` (char ',')
+parseIdentifiers = parseIdentifier `sepBy` 
+                    (char ',' *> qsWhiteSpace)
 
+-- Parsing variables
 parseVar :: Parser Var
-parseVar = ((\a b -> (AST.Var a b)) <$>
-           (parseIdentifiers)       <*>
-           ((string ":")            *>
-           (parseType <* semicolon)))
+parseVar = Var <$> parseIdentifiers <*> (string ":" *>
+                                         parseType  <*
+                                         semicolon)
 
 parseVariables :: Parser [Var]
-parseVariables = ((parseVar) `sepEndBy` (whiteSpace lexer))
+parseVariables = parseVar `sepEndBy` qsWhiteSpace
 
+-- Parsing declarations
 parseDeclaration :: Parser Declaration
-parseDeclaration = AST.QSDeclaration <$>
-                  (string "VAR"      *>
-                  (whiteSpace lexer) *>
-                  parseVariables)
+parseDeclaration = Declaration <$> (string "VAR" *>
+                                    qsWhiteSpace *>
+                                    parseVariables)
 
+-- Parsing blocks
 parseBlock :: Parser Block
-parseBlock = QSBlock <$> parseDeclaration <*> parseCompoundStatement
+parseBlock = Block <$> parseDeclaration <*> parseCompoundStatements
 
+parseCompoundStatements :: Parser [CompoundStatement]
+parseCompoundStatements = parseCompoundStatement `sepBy`
+                                 qsWhiteSpace
+
+-- Parsing entire programs
 parseProgram :: Parser Program
-parseProgram = AST.QSProgram  <$>
-          ((string "PROGRAM"  <*
-          (whiteSpace lexer)) *>
-          ((parseIdentifier   <*
-          semicolon)          <*
-          (whiteSpace lexer)))<*>
-           parseBlock
+parseProgram = Program <$>
+    (string "PROGRAM" *> 
+     qsWhiteSpace     *>
+     parseIdentifier  <* semicolon <* qsWhiteSpace) <*>
+    parseBlock
