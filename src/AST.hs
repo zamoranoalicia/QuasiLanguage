@@ -5,7 +5,7 @@ module AST (
   , Var(..)
   , TypeVar(..)
   , CompoundStatement(..)
-  , Statement(..)
+  , Statement(Assign,EmptyStatement)
   , Expression(..)
   , Term(..)
   , Factor(..)

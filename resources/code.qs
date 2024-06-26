@@ -1,10 +1,8 @@
 PROGRAM test;
-
 VAR
-    a:INTEGER;
-    b:REAL;
-    c_d,e_f:INTEGER;
-    
+    xy_z:INTEGER;
+    abc:REAL;
+    cdf,xy:INTEGER;
 BEGIN
     xy_z := 2+7;
     abc  := 3+4;
