@@ -7,8 +7,8 @@ module AST (
   , CompoundStatement(..)
   , Statement(Assign,EmptyStatement)
   , Expression(..)
-  , Term(..)
-  , Factor(..)
+  , Term(TermFactor)
+  , Factor(Value)
   , Identifier(..)
 ) where
 
