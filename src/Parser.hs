@@ -168,6 +168,13 @@ parseProgram = Program <$>
      parseIdentifier  <* semicolon <* qsWhiteSpace) <*>
     parseBlock
 
+parseCompoundStatementsProcedure :: Parser CompoundStatementProcedure
+parseCompoundStatementsProcedure = CompoundStatementProcedure <$> (string "BEGIN"  *>
+     qsWhiteSpace    *>
+     parseStatements <*
+     string "END"    <*
+     semicolon)
+
 parseProcedure :: Parser Procedure
 parseProcedure = Procedure <$> (string "PROCEDURE" *> qsWhiteSpace *> identifierTypeVar)
 
