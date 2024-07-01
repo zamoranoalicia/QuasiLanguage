@@ -1,6 +1,6 @@
 program ::= PROGRAM ID SEMI block DOT
 
-block ::= declarations compound_statement
+block ::= declarations procedure_statement? compound_statement
 
 declarations ::= VAR (variable_declaration SEMI)+
                  | empty
@@ -11,25 +11,34 @@ type_spec ::= INTEGER | REAL
 
 compound_statement ::= BEGIN statement_list END
 
-statement_list ::= statement
-               | statement SEMI statement_list
+statement_list ::= statement | statement SEMI statement_list
 
 statement ::= compound_statement
-          | assignment_statement
-          | empty
+            | assignment_statement
+            | procedure_statement
+            | empty
+
+procedure_statement ::= PROCEDURE ID LPAREN procedure_params RPAREN SEMI procedue_statement_list
+
+procedue_statement_list ::= procedure_body_statement | procedure_body_statement SEMI procedure_body_statement_list
+
+procedure_body_statement ::= declarations | assignment_statement | empty
+
+procedure_params ::= (variable_declaration (COMMA variable_declaration)*)?
 
 assignment_statement ::= variable ASSIGN expr
 
+
 empty ::=
 
-expr::= term ((PLUS | MINUS) term)*
+expr ::= term ((PLUS | MINUS) term)*
 
-term::= factor ((MUL | DIV) factor)*
+term ::= factor ((MUL | DIV) factor)*
 
 factor ::= PLUS factor
-       | MINUS factor
-       | INTEGER
-       | LPAREN expr RPAREN
-       | variable
+         | MINUS factor
+         | INTEGER
+         | LPAREN expr RPAREN
+         | variable
 
-variable::= ID
+variable ::= ID

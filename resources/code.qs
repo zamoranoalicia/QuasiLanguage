@@ -10,3 +10,10 @@ BEGIN
     abc := 2+7;
     wvy := 3+5;
 END.
+
+
+PROCEDURE Alpha(a : INTEGER);
+
+VAR y:INTEGER;
+BEGIN
+END.
