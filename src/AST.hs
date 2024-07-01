@@ -10,6 +10,8 @@ module AST (
   , Term(TermFactor)
   , Factor(Value)
   , Identifier(..)
+  , Procedure
+  , ProcedureBlock
 ) where
 
 -- | Represents an entire program.
@@ -17,8 +19,13 @@ data Program = Program Identifier Block
     deriving (Show, Eq)
 
 -- | Represents a block of declarations and compound statements.
-data Block = Block Declaration [CompoundStatement]
+data Block = Block Declaration [Procedure] [CompoundStatement]
     deriving (Show, Eq)
+
+-- | Represents a procedure 
+-- | It is necessary to add these 2 new definitions and add procedure to block to be able to instantiate it
+data Procedure = Procedure Identifier [Var] ProcedureBlock
+data ProcedureBlock = ProcedureBlock Declaration CompoundStatement
 
 -- | Represents a declaration consisting of a list of variables.
 data Declaration = Declaration [Var]
