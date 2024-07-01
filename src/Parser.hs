@@ -154,6 +154,7 @@ parseDeclaration = Declaration <$> (string "VAR" *>
 -- Parsing blocks
 parseBlock :: Parser Block
 parseBlock = Block <$> parseDeclaration <*> parseCompoundStatements
+            <|> BlockProcedure <$> parseProcedure <*> parseCompoundStatementsProcedure
 
 parseCompoundStatements :: Parser [CompoundStatement]
 parseCompoundStatements = parseCompoundStatement `sepBy`
@@ -166,3 +167,9 @@ parseProgram = Program <$>
      qsWhiteSpace     *>
      parseIdentifier  <* semicolon <* qsWhiteSpace) <*>
     parseBlock
+
+parseProcedure :: Parser Procedure
+parseProcedure = Procedure <$> 
+                (string "PROCEDURE" *>
+                qsWhiteSpace *>
+                )
