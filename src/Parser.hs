@@ -49,6 +49,7 @@ languageDef = emptyDef
                          , "REAL"]
     , reservedOpNames = ["+", "-", "*", "/", ":="
                          , "==", "<", ">", "<=", ">="]
+    , agrupation      = ["(", ")"]
     , caseSensitive   = True
     }
 
@@ -166,3 +167,20 @@ parseProgram = Program <$>
      qsWhiteSpace     *>
      parseIdentifier  <* semicolon <* qsWhiteSpace) <*>
     parseBlock
+
+parseFunction :: Parser Function
+parseFunction = Function <$>
+    (char "(" *> qsWhiteSpace *> parseParams <* qsWhiteSpace <* char ")")
+
+parseFunctionParam :: Parser FunctionParam
+parseFunctionParam = FunctionParam <$> (parseIdentifier <*> char ':' *> parseType)
+
+parseParams :: Parser [FunctionParam]
+parseParams = parseFunctionParam `sepBy` (char ',' *> qsWhiteSpace) 
+
+parseFunctionStatement :: Parser FunctionStatement
+parseFunctionStatement = parseCompoundStatement
+
+parseListFunctionStatements :: Parse [FunctionStatement]
+parseListFunctionStatements = parseFunctionStatement `sepBy`
+                                 qsWhiteSpace

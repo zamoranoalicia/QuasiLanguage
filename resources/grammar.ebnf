@@ -16,6 +16,7 @@ statement_list ::= statement
 
 statement ::= compound_statement
           | assignment_statement
+          | function
           | empty
 
 assignment_statement ::= variable ASSIGN expr
@@ -33,3 +34,13 @@ factor ::= PLUS factor
        | variable
 
 variable::= ID
+
+function ::= PROCEDURE function_params SEMI function_statement
+
+function_params ::= '(' (param_declaration | empty) ')'
+
+param_declaration ::= ID COLON type_spec (COMMA ID COLON type_spec)*
+
+function_statement ::= compound_statement
+                     | assignment_statement
+                     | empty
