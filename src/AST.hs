@@ -5,10 +5,14 @@ module AST (
   , Var(..)
   , TypeVar(..)
   , CompoundStatement(..)
-  , Statement(Assign,EmptyStatement)
+  , Statement(..)
+  , ProcedureStatement(..)
+  , ProcedureParams(..)
+  , ProcedureBodyStatement(..)
+  , ProcedureStatementList(..)
   , Expression(..)
-  , Term(TermFactor)
-  , Factor(Value)
+  , Term(..)
+  , Factor(..)
   , Identifier(..)
 ) where
 
@@ -16,12 +20,13 @@ module AST (
 data Program = Program Identifier Block
     deriving (Show, Eq)
 
--- | Represents a block of declarations and compound statements.
-data Block = Block Declaration [CompoundStatement]
+-- | Represents a block of declarations, procedure statements, and compound statements.
+data Block = Block Declaration (Maybe ProcedureStatement) CompoundStatement
     deriving (Show, Eq)
 
 -- | Represents a declaration consisting of a list of variables.
 data Declaration = Declaration [Var]
+                 | Empty
     deriving (Show, Eq)
 
 -- | Represents a variable with a list of identifiers and a type.
@@ -37,9 +42,27 @@ data TypeVar = INTEGER
 data CompoundStatement = CompoundStatement [Statement]
     deriving (Show, Eq)
 
--- | Represents a statement, which can be an assignment or an empty statement.
-data Statement = Assign Identifier Expression
+-- | Represents a statement, which can be a compound statement, assignment, procedure statement, or empty.
+data Statement = CompoundStmt CompoundStatement
+               | AssignStmt Identifier Expression
+               | ProcedureStmt ProcedureStatement
                | EmptyStatement
+    deriving (Show, Eq)
+
+data ProcedureStatement = ProcedureStatement Identifier ProcedureParams ProcedureStatementList
+    deriving (Show, Eq)
+
+data ProcedureParams = ProcedureParams [Var]
+                     | NoProcedureParams
+    deriving (Show, Eq)
+
+data ProcedureBodyStatement = ProcedureDeclaration Declaration
+                             | ProcedureAssignment Expression
+                             | ProcedureEmpty
+    deriving (Show, Eq)
+
+data ProcedureStatementList = ProcedureStatementList [ProcedureBodyStatement]
+                             | EmptyProcedureStatementList
     deriving (Show, Eq)
 
 -- | Represents an expression, which can be an addition, subtraction, or a term.
@@ -54,8 +77,12 @@ data Term = Div Factor Factor
           | TermFactor Factor
     deriving (Show, Eq)
 
--- | Represents a factor, which is a value.
-data Factor = Value Int
+-- | Represents a factor, which can be a positive or negative factor, an integer, a parenthesized expression, or a variable.
+data Factor = PlusFactor Factor
+            | MinusFactor Factor
+            | IntegerFactor Int
+            | ParenFactor Expression
+            | VariableFactor Identifier
     deriving (Show, Eq)
 
 -- | Represents an identifier.
