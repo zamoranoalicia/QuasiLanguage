@@ -46,8 +46,9 @@ languageDef = emptyDef
                          , "BLOCK"
                          , "PROGRAM"
                          , "INTEGER"
-                         , "REAL"]
-    , reservedOpNames = ["+", "-", "*", "/", ":="
+                         , "REAL"
+                         , "PRECEDURE"]
+    , reservedOpNames = ["+", "-", "*", "/", ":=" , ":", "(" , ")"
                          , "==", "<", ">", "<=", ">="]
     , caseSensitive   = True
     }
@@ -73,8 +74,11 @@ parseCompoundStatement = CompoundStatement <$>
     (string "BEGIN"  *>
      qsWhiteSpace    *>
      parseStatements <*
+     parseNewLine    <*
      string "END"    <*
-     dotParse)
+     semicolon       <*
+     dotParse    <*
+     qsWhiteSpace )
 
 parseStatements :: Parser [Statement]
 parseStatements = parseStatement `sepEndBy` qsWhiteSpace
@@ -149,8 +153,18 @@ parseVariables = parseVar `sepEndBy` qsWhiteSpace
 parseDeclaration :: Parser Declaration
 parseDeclaration = Declaration <$> (string "VAR" *>
                                     qsWhiteSpace *>
-                                    parseVariables)
+                                    parseVariables )
 
+-- Parsing methods (procedures)
+parseMethod :: Parser Method
+parseMethod = Method <$> (string "PROCEDURE" *>
+                         qsWhiteSpace *>
+                         parseIdentifier <* string "(" 
+                        <* parseVariables
+                         <* string ":" 
+                         <* parseType <* string ")")
+
+ 
 -- Parsing blocks
 parseBlock :: Parser Block
 parseBlock = Block <$> parseDeclaration <*> parseCompoundStatements
@@ -165,4 +179,13 @@ parseProgram = Program <$>
     (string "PROGRAM" *> 
      qsWhiteSpace     *>
      parseIdentifier  <* semicolon <* qsWhiteSpace) <*>
+     -- parseMethod      <*>
     parseBlock
+
+
+
+
+
+
+
+
