@@ -1,9 +1,12 @@
 program ::= PROGRAM ID SEMI block DOT
 
-block ::= declarations procedure_statement? compound_statement
+block ::= declarations procedure_declarations compound_statement
 
 declarations ::= VAR (variable_declaration SEMI)+
-                 | empty
+               | empty
+
+procedure_declarations ::= (procedure_declaration SEMI)*
+                         | empty
 
 variable_declaration ::= ID (COMMA ID)* COLON type_spec
 
@@ -11,34 +14,46 @@ type_spec ::= INTEGER | REAL
 
 compound_statement ::= BEGIN statement_list END
 
-statement_list ::= statement | statement SEMI statement_list
+statement_list ::= statement
+               | statement SEMI statement_list
 
 statement ::= compound_statement
-            | assignment_statement
-            | procedure_statement
-            | empty
+          | assignment_statement
+          | procedure_call
+          | empty
 
-procedure_statement ::= PROCEDURE ID LPAREN procedure_params RPAREN SEMI procedue_statement_list
+procedure_declaration ::= PROCEDURE ID LPAREN parameter_list RPAREN SEMI procedure_block
 
-procedue_statement_list ::= procedure_body_statement | procedure_body_statement SEMI procedure_body_statement_list
+procedure_block ::= procedure_statement_list
 
-procedure_body_statement ::= declarations | assignment_statement | empty
+procedure_statement_list ::= procedure_statement
+                          | procedure_statement SEMI procedure_statement_list
 
-procedure_params ::= (variable_declaration (COMMA variable_declaration)*)?
+procedure_statement ::= assignment_statement
+                     | declarations
+                     | procedure_call
+                     | empty
+
+parameter_list ::= parameter | paratemer COMMA parameter_list | empty
+
+parameter ::= ID COLON type_spec 
+
+procedure_call ::= ID LPAREN argument_list RPAREN
+
+argument_list ::= expr | expr COMMA argument_list | empty
 
 assignment_statement ::= variable ASSIGN expr
 
-
-empty ::=
+empty ::= 
 
 expr ::= term ((PLUS | MINUS) term)*
 
 term ::= factor ((MUL | DIV) factor)*
 
 factor ::= PLUS factor
-         | MINUS factor
-         | INTEGER
-         | LPAREN expr RPAREN
-         | variable
+       | MINUS factor
+       | INTEGER
+       | LPAREN expr RPAREN
+       | variable
 
 variable ::= ID

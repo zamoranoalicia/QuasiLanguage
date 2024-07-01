@@ -20,6 +20,12 @@ module Parser (
   , parseDeclaration
   , parseBlock
   , parseProgram
+  , parseProcedureDeclaration
+  , parseProcedureBlock
+  , parseProcedureStatementList
+  , parseProcedureStatement
+  , parseParameterList
+  , parseParameter
 ) where
 
 import AST
@@ -46,7 +52,8 @@ languageDef = emptyDef
                          , "BLOCK"
                          , "PROGRAM"
                          , "INTEGER"
-                         , "REAL"]
+                         , "REAL"
+                         , "PROCEDURE"]
     , reservedOpNames = ["+", "-", "*", "/", ":="
                          , "==", "<", ">", "<=", ">="]
     , caseSensitive   = True
@@ -82,7 +89,6 @@ parseStatements = parseStatement `sepEndBy` qsWhiteSpace
 parseStatement :: Parser Statement
 parseStatement = try parseAssignment <|> parseEmpty
 
-
 -- Parsing empty statements (new lines)
 parseNewLine :: Parser Char
 parseNewLine = char '\n' <|> char '\r' <|> char '\t'
@@ -94,7 +100,7 @@ parseEmpty = EmptyStatement <$ parseNewLine
 parseAssignment :: Parser Statement
 parseAssignment = Assign <$> (parseIdentifier   <*
                               parseAssignSymbol <*
-                              qsWhiteSpace)<*>parseExpression
+                              qsWhiteSpace) <*> parseExpression
 
 parseAssignSymbol :: Parser String
 parseAssignSymbol = string ":="
@@ -109,7 +115,7 @@ parseOperation = parsePlus
 parsePlus :: Parser Expression
 parsePlus = Plus <$> (parseTermFactor <*
                       parsePlusSign   <*
-                      qsWhiteSpace)   <*> parseTermFactor
+                      qsWhiteSpace) <*> parseTermFactor
 
 parsePlusSign :: Parser Char
 parsePlusSign = char '+'
@@ -134,7 +140,7 @@ parseIdentifier :: Parser Identifier
 parseIdentifier = Identifier <$> qlIdentifier
 
 parseIdentifiers :: Parser [Identifier]
-parseIdentifiers = parseIdentifier `sepBy`
+parseIdentifiers = parseIdentifier `sepBy` 
                     (char ',' *> qsWhiteSpace)
 
 -- Parsing variables
@@ -152,18 +158,49 @@ parseDeclaration = Declaration <$> (string "VAR" *>
                                     qsWhiteSpace *>
                                     parseVariables)
 
+-- Parsing procedure declarations
+parseProcedureDeclaration :: Parser ProcedureDeclaration
+parseProcedureDeclaration = ProcedureDeclaration
+    <$> (string "PROCEDURE" *> qsWhiteSpace *> parseIdentifier)
+    <*> (qsWhiteSpace *> char '(' *> parseParameterList <* char ')')
+    <*> (semicolon *> qsWhiteSpace *> parseProcedureBlock)
+
+parseProcedureBlock :: Parser ([Declaration], [Statement])
+parseProcedureBlock = (,) <$> many (try parseDeclaration)
+                          <*> parseProcedureStatementList
+
+parseProcedureStatementList :: Parser [Statement]
+parseProcedureStatementList = parseProcedureStatement `sepEndBy` semicolon
+
+parseProcedureStatement :: Parser Statement
+parseProcedureStatement = try parseAssignment <|> parseEmpty
+
+parseParameterList :: Parser [Parameter]
+parseParameterList = parseParameter `sepBy` (char ',' *> qsWhiteSpace)
+
+parseParameter :: Parser Parameter
+parseParameter = Parameter
+    <$> parseIdentifier
+    <*> (qsWhiteSpace *> char ':' *> qsWhiteSpace *> parseType)
+
 -- Parsing blocks
 parseBlock :: Parser Block
-parseBlock = Block <$> parseDeclaration <*> parseCompoundStatements
+parseBlock = Block <$> parseDeclarations
+                   <*> parseProcedureDeclarations
+                   <*> parseCompoundStatements
 
-parseCompoundStatements :: Parser [CompoundStatement]
-parseCompoundStatements = parseCompoundStatement `sepBy`
-                                 qsWhiteSpace
+parseDeclarations :: Parser [Declaration]
+parseDeclarations = many (try parseDeclaration)
+
+parseProcedureDeclarations :: Parser [ProcedureDeclaration]
+parseProcedureDeclarations = many (try parseProcedureDeclaration)
+
+parseCompoundStatements :: Parser CompoundStatement
+parseCompoundStatements = CompoundStatement
+    <$> (string "BEGIN" *> qsWhiteSpace *> parseStatements <* string "END")
 
 -- Parsing entire programs
 parseProgram :: Parser Program
-parseProgram = Program <$>
-    (string "PROGRAM" *>
-     qsWhiteSpace     *>
-     parseIdentifier  <* semicolon <* qsWhiteSpace) <*>
-    parseBlock
+parseProgram = Program
+    <$> (string "PROGRAM" *> qsWhiteSpace *> parseIdentifier <* semicolon <* qsWhiteSpace)
+    <*> parseBlock
