@@ -3,14 +3,14 @@ program ::= PROGRAM ID SEMI block DOT
 block ::= declarations compound_statement
 
 declarations ::= VAR (variable_declaration SEMI)+
-                 | PROCEDURE (procedure_declaration SEMI)
+                 | PROCEDURE (procedure_declaration SEMI)+
                  | empty
 
 variable_declaration ::= ID (COMMA ID)* COLON type_spec
 
-procedure_declaration ::= ID P_OPEN procedure_body P_CLOSE
-
-procedure_body ::= ID (COMMA ID)* COLON type_spec
+procedure_declaration ::= procedure_identifier procedure_return compound_statement
+procedure_identifier ::= ID P_OPEN variable_declaration P_CLOSE SEMI
+procedure_return ::= declarations
 
 type_spec ::= INTEGER | REAL
 
