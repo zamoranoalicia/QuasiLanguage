@@ -80,7 +80,8 @@ parseStatements :: Parser [Statement]
 parseStatements = parseStatement `sepEndBy` qsWhiteSpace
 
 parseStatement :: Parser Statement
-parseStatement = try parseAssignment <|> parseEmpty
+parseStatement = parseAssignment <|> parseProcedureStatementStmt <|> parseEmpty
+
 
 -- Parsing empty statements (new lines)
 parseNewLine :: Parser Char
@@ -166,3 +167,17 @@ parseProgram = Program <$>
      qsWhiteSpace     *>
      parseIdentifier  <* semicolon <* qsWhiteSpace) <*>
     parseBlock
+
+parseProcedureStatementStmt :: Parser Statement
+parseProcedureStatementStmt = ProcedureStatement <$> parseProcedureStatement
+
+parseProcedureStatement :: Parser ProcedureStatement
+parseProcedureStatement = ProcedureStatement <$> (string "PROCEDURE" *> qsWhiteSpace *> parseIdentifier)
+                                             <*> (char '(' *> qsWhiteSpace *> parseParameters <* char ')')
+                                             <*> (semi *> qsWhiteSpace *> parseBlock)
+
+parseParameters :: Parser [Parameter]
+parseParameters = parseParameter `sepBy` (char ',' *> qsWhiteSpace)
+
+parseParameter :: Parser Parameter
+parseParameter = Parameter <$> parseIdentifier <*> (string ":" *> qsWhiteSpace *> parseType)

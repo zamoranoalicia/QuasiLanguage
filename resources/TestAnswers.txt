@@ -1,0 +1,16 @@
+1:BNF
+	1. Se tiene que crear una nueva subestructura procedure_statement que define la fomra en la que se tiene que hacer un procedure
+
+2: RailroadDiagram, el diagrama se encuentra dentro de la carpeta resources
+	
+3: ASTAGrege 2 nuevos datas sl AST: 1. ProcedureStatement que es la fomra en la que se tiene que construir un ProcedureStatement y dentro de esta se usa la segunda data creada, 2. Parameter que en el ProcedureStatement es la forma que uso para declarar variables ya que se maneja como lista. Por ultimo agrege ProcedureStatement a los Statement
+
+4: Parser lista de funciones:
+	- parseProcedureStatement
+	- parseParameters
+	- parseParameter
+	- update parseStatement
+
+5: Symbol Table: update data BuiltInType, para que acepte PROCEDURE, en SematicAnalyzer update 		analyzeStatement
+
+6: Interpreter: update interpretStatement para el uso de ProcedureStatement

@@ -16,6 +16,7 @@ statement_list ::= statement
 
 statement ::= compound_statement
           | assignment_statement
+          | procedure_statement
           | empty
 
 assignment_statement ::= variable ASSIGN expr
@@ -33,3 +34,7 @@ factor ::= PLUS factor
        | variable
 
 variable::= ID
+
+// Update
+
+procedure_statement ::= PROCEDURE ID LPAREN (variable_declaration (COMMA variable_declaration)*)? RPAREN SEMI block

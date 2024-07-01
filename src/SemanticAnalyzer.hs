@@ -38,6 +38,12 @@ analyzeStatement assign@(AST.Assign identifier exp) symbolTable =
         in case ST.lookupSymbol name table of
             Just _  -> updateSymbolExpression name expression table
             Nothing -> error (undefinedVariable name)
+            analyzeStatement stmt@(AST.ProcedureStatement (AST.ProcedureStatement ident params block)) table =
+        let name = ST.nameFromIdentifier ident
+        symbol = ST.Symbol name ST.PROCEDURE (ST.ProcedureValue params block)
+        in case ST.lookupSymbol name table of
+            Just _ -> error $ "Procedure already defined: " ++ name
+            Nothing -> (stmt, ST.insertSymbol name symbol table)
 analyzeStatement empty@(AST.EmptyStatement) symbolTable = (empty, symbolTable)
 
 updateSymbolExpression :: String -> AST.Expression -> ST.SymbolTable -> ST.SymbolTable 
