@@ -80,7 +80,26 @@ parseStatements :: Parser [Statement]
 parseStatements = parseStatement `sepEndBy` qsWhiteSpace
 
 parseStatement :: Parser Statement
-parseStatement = try parseAssignment <|> parseEmpty
+parseStatement = try parseAssignment <|> parseIf <|> parseWhile <|> parseComment <|> parseEmpty
+
+parseWhile :: Parser Statement
+parseWhile = do
+    _ <- string "WHILE"
+    cond <- parseExpression
+    _ <- string "DO"
+    While cond <$> parseStatement
+
+parseIf :: Parser Statement
+parseIf = do
+    _ <- string "IF"
+    cond <- parseExpression
+    _ <- string "THEN"
+    trueStmt <- parseStatement
+    falseStmt <- optionMaybe (string "ELSE" *> parseStatement)
+    return $ If cond trueStmt falseStmt
+
+parseComment :: Parser Statement
+parseComment = Comment <$> (string "//" *> manyTill anyChar (char '\n'))
 
 -- Parsing empty statements (new lines)
 parseNewLine :: Parser Char
@@ -133,7 +152,7 @@ parseIdentifier :: Parser Identifier
 parseIdentifier = Identifier <$> qlIdentifier
 
 parseIdentifiers :: Parser [Identifier]
-parseIdentifiers = parseIdentifier `sepBy` 
+parseIdentifiers = parseIdentifier `sepBy`
                     (char ',' *> qsWhiteSpace)
 
 -- Parsing variables
@@ -162,7 +181,7 @@ parseCompoundStatements = parseCompoundStatement `sepBy`
 -- Parsing entire programs
 parseProgram :: Parser Program
 parseProgram = Program <$>
-    (string "PROGRAM" *> 
+    (string "PROGRAM" *>
      qsWhiteSpace     *>
      parseIdentifier  <* semicolon <* qsWhiteSpace) <*>
     parseBlock
