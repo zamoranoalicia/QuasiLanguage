@@ -1,9 +1,12 @@
 program ::= PROGRAM ID SEMI block DOT
 
-block ::= declarations compound_statement
+block ::= declarations procedure_declarations compound_statement
 
 declarations ::= VAR (variable_declaration SEMI)+
-                 | empty
+               | empty
+
+procedure_declarations ::= (procedure_declaration SEMI)*
+                         | empty
 
 variable_declaration ::= ID (COMMA ID)* COLON type_spec
 
@@ -16,7 +19,28 @@ statement_list ::= statement
 
 statement ::= compound_statement
           | assignment_statement
+          | procedure_call
           | empty
+
+procedure_declaration ::= PROCEDURE ID LPAREN parameter_list RPAREN SEMI procedure_block
+
+procedure_block ::= procedure_statement_list
+
+procedure_statement_list ::= procedure_statement
+                          | procedure_statement SEMI procedure_statement_list
+
+procedure_statement ::= assignment_statement
+                     | declarations
+                     | procedure_call
+                     | empty
+
+parameter_list ::= parameter | paratemer COMMA parameter_list | empty
+
+parameter ::= ID COLON type_spec 
+
+procedure_call ::= ID LPAREN argument_list RPAREN
+
+argument_list ::= expr | expr COMMA argument_list | empty
 
 assignment_statement ::= variable ASSIGN expr
 

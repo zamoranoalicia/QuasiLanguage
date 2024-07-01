@@ -5,10 +5,12 @@ module AST (
   , Var(..)
   , TypeVar(..)
   , CompoundStatement(..)
-  , Statement(Assign,EmptyStatement)
+  , Statement(..)
+  , ProcedureDeclaration(..)
+  , Parameter(..)
   , Expression(..)
-  , Term(TermFactor)
-  , Factor(Value)
+  , Term(..)
+  , Factor(..)
   , Identifier(..)
 ) where
 
@@ -17,7 +19,7 @@ data Program = Program Identifier Block
     deriving (Show, Eq)
 
 -- | Represents a block of declarations and compound statements.
-data Block = Block Declaration [CompoundStatement]
+data Block = Block [Declaration] [ProcedureDeclaration] CompoundStatement
     deriving (Show, Eq)
 
 -- | Represents a declaration consisting of a list of variables.
@@ -40,6 +42,12 @@ data CompoundStatement = CompoundStatement [Statement]
 -- | Represents a statement, which can be an assignment or an empty statement.
 data Statement = Assign Identifier Expression
                | EmptyStatement
+    deriving (Show, Eq)
+
+data ProcedureDeclaration = ProcedureDeclaration Identifier [Parameter] ([Declaration], [Statement])
+    deriving (Show, Eq)
+
+data Parameter = Parameter Identifier TypeVar
     deriving (Show, Eq)
 
 -- | Represents an expression, which can be an addition, subtraction, or a term.
