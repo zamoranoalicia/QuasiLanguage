@@ -20,6 +20,7 @@ module Parser (
   , parseDeclaration
   , parseBlock
   , parseProgram
+  , parseProcedure
 ) where
 
 import AST
@@ -46,7 +47,8 @@ languageDef = emptyDef
                          , "BLOCK"
                          , "PROGRAM"
                          , "INTEGER"
-                         , "REAL"]
+                         , "REAL"
+                         , "PROCEDURE"]
     , reservedOpNames = ["+", "-", "*", "/", ":="
                          , "==", "<", ">", "<=", ">="]
     , caseSensitive   = True
@@ -151,9 +153,19 @@ parseDeclaration = Declaration <$> (string "VAR" *>
                                     qsWhiteSpace *>
                                     parseVariables)
 
+parseProcedure :: Parser Procedure
+parseProcedure = do
+    string "PROCEDURE"
+    _ <- qsWhiteSpace
+    procedureName <- parseIdentifier
+    variables <- parseVariables
+    semicolon
+    blockContent <- parseBlock
+    return $ Procedure procedureName variables blockContent
+
 -- Parsing blocks
 parseBlock :: Parser Block
-parseBlock = Block <$> parseDeclaration <*> parseCompoundStatements
+parseBlock = Block <$> parseDeclaration <*> parseCompoundStatements <*> parseProcedure
 
 parseCompoundStatements :: Parser [CompoundStatement]
 parseCompoundStatements = parseCompoundStatement `sepBy`
