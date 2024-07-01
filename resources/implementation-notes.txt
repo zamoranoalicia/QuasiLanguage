@@ -1,0 +1,12 @@
+languageDef
+    reservedOpNames should be updated to handle the parentheses
+
+Add a function to parse open and closed parentheses
+Add a procedure_declaration parser
+Add a procedure_identifier parser
+Add a procedure_return parser
+
+Updated declarations parser with procedures feature
+
+
+
