@@ -1,0 +1,29 @@
+4..Update the parser Functions to handle the new syntax
+
+1. List the functions that need to be updated pr added to the parser
+R.  ParseMethod and parseProgram functions need to be added to the parser functions to handle the new syntax 
+2 provide the code for these functions
+
+
+
+5.. Symbol Table
+
+Modify the symbol table to sore the new procedure declarations
+1. Explain how the symbol table should be update to have proceduces in the current program
+
+Can be added a new field to the Symbol data type to store the procedure declaration. 
+The Symbol data type would be modified to:
+data Symbol =   Symbol String BuiltInType
+                SymbolValue (Maybe Procedure) 
+                deriving (Show, Eq)
+
+
+6.. Update the interpreter to handler the new procedure declarations and usage
+
+Describe the changes necessary in the interpreter to supports the new syntax
+
+R. The changes necessary in the interpreter to support the new syntax are:
+- Add a new data type to represent a procedure call.
+- Add a new function to interpret a procedure call.
+- Add a new data type to represent a block of procedures.   
+- Add a new data type to represent a program with a block of procedures.

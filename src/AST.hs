@@ -10,6 +10,7 @@ module AST (
   , Term(TermFactor)
   , Factor(Value)
   , Identifier(..)
+  , Method(..)
 ) where
 
 -- | Represents an entire program.
@@ -22,6 +23,9 @@ data Block = Block Declaration [CompoundStatement]
 
 -- | Represents a declaration consisting of a list of variables.
 data Declaration = Declaration [Var]
+    deriving (Show, Eq)
+
+data Method = Method Identifier
     deriving (Show, Eq)
 
 -- | Represents a variable with a list of identifiers and a type.
