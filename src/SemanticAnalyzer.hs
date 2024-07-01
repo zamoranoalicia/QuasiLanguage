@@ -80,10 +80,17 @@ analyzeStatements :: ST.SymbolTable -> [AST.Statement] -> ST.SymbolTable
 analyzeStatements = foldl (\table stmt -> snd (analyzeStatement stmt table))
 
 analyzeBlock :: AST.Block -> ST.SymbolTable -> (AST.Block, ST.SymbolTable)
-analyzeBlock block@(AST.Block declaration compStatements) symbolTable = 
+analyzeBlock block@(AST.Block declaration procedures compStatements) symbolTable = 
     (block, analyzeCompStatements updatedSymbolTable compStatements)
   where
     updatedSymbolTable = snd (analyzeDecl declaration symbolTable)
+
+analyzeProcedure :: AST.Procedure -> ST.SymbolTable -> (AST.Procedure, ST.SymbolTable)
+analyzeProcedure procedure@(AST.Procedure _ _ statements _) symbolTable = 
+  (procedure, analyzeStatements symbolTable statements)
+
+analyzeProcedures :: ST.SymbolTable -> [AST.Procedure] -> ST.SymbolTable
+analyzeProcedures = foldl (\table proce -> snd (analyzeProcedure proce table) )
 
 analyzeCompStatements :: ST.SymbolTable -> [AST.CompoundStatement] -> ST.SymbolTable
 analyzeCompStatements = foldl (\table compStmt -> snd (analyzeCompStatement compStmt table))
