@@ -11,6 +11,7 @@ module SymbolTable(
                   , symbolValueFromValue
                   , valueFromSymbolValue
                   , BuiltInType(INTEGER)
+                  , emptyST
                   ) where
 
 import qualified Data.Map as Map
@@ -18,6 +19,9 @@ import qualified AST as AST
 
 
 type SymbolTable = Map.Map String Symbol
+
+emptyST :: SymbolTable
+emptyST = Map.empty
 
 data Scope = GLOBAL|
              LOCAL |
