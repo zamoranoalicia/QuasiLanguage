@@ -75,15 +75,9 @@ data Expression = Plus Term Term
 data Term = Div Factor Factor
           | Mul Factor Factor
           | TermFactor Factor
-    deriving (Show, Eq)
-
+          
 -- | Represents a factor, which can be a positive or negative factor, an integer, a parenthesized expression, or a variable.
-data Factor = PlusFactor Factor
-            | MinusFactor Factor
-            | IntegerFactor Int
-            | ParenFactor Expression
-            | VariableFactor Identifier
-    deriving (Show, Eq)
+data Factor = Value Int
 
 -- | Represents an identifier.
 data Identifier = Identifier String
