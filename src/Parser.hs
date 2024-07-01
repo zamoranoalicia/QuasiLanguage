@@ -1,55 +1,71 @@
-module Parser (
-    parseStatement
-  , parseExpression
-  , qsWhiteSpace
-  , lexer
-  , opLetter
-  , languageDef
-  , dotParse
-  , parseCompoundStatement
-  , parseAssignment
-  , parseStatements
-  , parseNewLine
-  , parseAssignSymbol
-  , qlIdentifier
-  , parseType
-  , parseIdentifiers
-  , parseIdentifier
-  , parseVar
-  , parseVariables
-  , parseDeclaration
-  , parseBlock
-  , parseProgram
-) where
+module Parser
+  ( parseStatement,
+    parseExpression,
+    qsWhiteSpace,
+    lexer,
+    opLetter,
+    languageDef,
+    dotParse,
+    parseCompoundStatement,
+    parseAssignment,
+    parseStatements,
+    parseNewLine,
+    parseAssignSymbol,
+    qlIdentifier,
+    parseType,
+    parseIdentifiers,
+    parseIdentifier,
+    parseVar,
+    parseVariables,
+    parseDeclaration,
+    parseBlock,
+    parseProgram,
+    parseProcedure,
+    parseProcedures,
+  )
+where
 
 import AST
 import Text.Parsec
+import Text.Parsec.Language (emptyDef)
 import Text.Parsec.String
 import Text.Parsec.Token
-import Text.Parsec.Language (emptyDef)
 import qualified Text.Parsec.Token as P
 
 -- Language definition for the lexer
 languageDef :: LanguageDef st
-languageDef = emptyDef
-    { commentStart    = "/*"
-    , commentEnd      = "*/"
-    , commentLine     = "//"
-    , nestedComments  = True
-    , identStart      = letter
-    , identLetter     = alphaNum <|> oneOf "_'"
-    , opStart         = opLetter emptyDef
-    , opLetter        = oneOf ":!#$%&*+./<=>?@\\^|-~"
-    , reservedNames   = ["BEGIN"
-                         , "END"
-                         , "VAR"
-                         , "BLOCK"
-                         , "PROGRAM"
-                         , "INTEGER"
-                         , "REAL"]
-    , reservedOpNames = ["+", "-", "*", "/", ":="
-                         , "==", "<", ">", "<=", ">="]
-    , caseSensitive   = True
+languageDef =
+  emptyDef
+    { commentStart = "/*",
+      commentEnd = "*/",
+      commentLine = "//",
+      nestedComments = True,
+      identStart = letter,
+      identLetter = alphaNum <|> oneOf "_'",
+      opStart = opLetter emptyDef,
+      opLetter = oneOf ":!#$%&*+./<=>?@\\^|-~",
+      reservedNames =
+        [ "BEGIN",
+          "END",
+          "VAR",
+          "BLOCK",
+          "PROGRAM",
+          "INTEGER",
+          "REAL"
+        ],
+      reservedOpNames =
+        [ "+",
+          "-",
+          "*",
+          "/",
+          ":=",
+          "==",
+          "<",
+          ">",
+          "<=",
+          ">="
+        ],
+      caseSensitive = True
     }
 
 lexer :: TokenParser st
@@ -69,12 +85,14 @@ semicolon = char ';'
 
 -- Parsing compound statements
 parseCompoundStatement :: Parser CompoundStatement
-parseCompoundStatement = CompoundStatement <$>
-    (string "BEGIN"  *>
-     qsWhiteSpace    *>
-     parseStatements <*
-     string "END"    <*
-     dotParse)
+parseCompoundStatement =
+  CompoundStatement
+    <$> ( string "BEGIN"
+            *> qsWhiteSpace
+            *> parseStatements
+            <* string "END"
+            <* dotParse
+        )
 
 parseStatements :: Parser [Statement]
 parseStatements = parseStatement `sepEndBy` qsWhiteSpace
@@ -91,9 +109,16 @@ parseEmpty = EmptyStatement <$ parseNewLine
 
 -- Parsing assignment statements
 parseAssignment :: Parser Statement
-parseAssignment = Assign <$> (parseIdentifier   <*
-                              parseAssignSymbol <*
-                              qsWhiteSpace)<*>parseExpression
+parseAssignment =
+  Assign
+    <$ qsWhiteSpace
+    <*> ( parseIdentifier
+            <* qsWhiteSpace
+            <* parseAssignSymbol
+            <* qsWhiteSpace
+        )
+    <* qsWhiteSpace
+    <*> parseExpression
 
 parseAssignSymbol :: Parser String
 parseAssignSymbol = string ":="
@@ -106,9 +131,15 @@ parseOperation :: Parser Expression
 parseOperation = parsePlus
 
 parsePlus :: Parser Expression
-parsePlus = Plus <$> (parseTermFactor <*
-                      parsePlusSign   <*
-                      qsWhiteSpace)   <*> parseTermFactor
+parsePlus =
+  Plus
+    <$> ( parseTermFactor
+            <* qsWhiteSpace
+            <* parsePlusSign
+            <* qsWhiteSpace
+            <* qsWhiteSpace
+        )
+    <*> parseTermFactor
 
 parsePlusSign :: Parser Char
 parsePlusSign = char '+'
@@ -125,44 +156,127 @@ parseDigit = read <$> many1 digit
 
 -- Parsing types
 parseType :: Parser TypeVar
-parseType = (INTEGER <$ string "INTEGER") <|>
-            (REAL <$ string "REAL")
+parseType =
+  (INTEGER <$ string "INTEGER")
+    <|> (REAL <$ string "REAL")
 
 -- Parsing identifiers
 parseIdentifier :: Parser Identifier
-parseIdentifier = Identifier <$> qlIdentifier
+parseIdentifier
+    = Identifier
+    <$ qsWhiteSpace
+    <*> qlIdentifier
+    <* qsWhiteSpace
 
 parseIdentifiers :: Parser [Identifier]
-parseIdentifiers = parseIdentifier `sepBy` 
-                    (char ',' *> qsWhiteSpace)
+parseIdentifiers =
+  parseIdentifier
+    `sepBy` (char ',' *> qsWhiteSpace)
 
 -- Parsing variables
 parseVar :: Parser Var
-parseVar = Var <$> parseIdentifiers <*> (string ":" *>
-                                         parseType  <*
-                                         semicolon)
+parseVar =
+  Var
+    <$ qsWhiteSpace
+    <*> parseIdentifiers
+    <* qsWhiteSpace
+    <* string ":"
+    <* qsWhiteSpace
+    <*> parseType
+    <* qsWhiteSpace
+    <* semicolon
+    <* endOfLine
 
 parseVariables :: Parser [Var]
-parseVariables = parseVar `sepEndBy` qsWhiteSpace
+parseVariables = many parseVar
 
 -- Parsing declarations
 parseDeclaration :: Parser Declaration
-parseDeclaration = Declaration <$> (string "VAR" *>
-                                    qsWhiteSpace *>
-                                    parseVariables)
+parseDeclaration =
+  Declaration
+    <$ qsWhiteSpace
+    <* string "VAR"
+    <* qsWhiteSpace
+    <*> parseVariables
+    <* endOfLine
 
 -- Parsing blocks
 parseBlock :: Parser Block
-parseBlock = Block <$> parseDeclaration <*> parseCompoundStatements
+parseBlock =
+  Block
+    <$ qsWhiteSpace
+    <*> parseDeclaration
+    <* qsWhiteSpace
+    <*> parseProcedures
+    <* qsWhiteSpace
+    <*> parseCompoundStatements
+    <* qsWhiteSpace
+
+parseProcedures :: Parser [Procedure]
+parseProcedures = many parseProcedure
 
 parseCompoundStatements :: Parser [CompoundStatement]
-parseCompoundStatements = parseCompoundStatement `sepBy`
-                                 qsWhiteSpace
+parseCompoundStatements =
+  parseCompoundStatement
+    `sepBy` qsWhiteSpace
+
+-- procedure
+parseProcedure :: Parser Procedure
+parseProcedure =
+  Procedure
+    <$ qsWhiteSpace
+    <* string "PROCEDURE"
+    <* qsWhiteSpace
+    <*> parseIdentifier
+    <* qsWhiteSpace
+    <* string "("
+    <* qsWhiteSpace
+    <*> parseProcedureParams
+    <* qsWhiteSpace
+    <* string ")"
+    <* qsWhiteSpace
+    <* string ""
+    <* qsWhiteSpace
+    <*> parseDeclaration
+    <* qsWhiteSpace
+    <*> parseProcedureStatement
+
+parseProcedureParams :: Parser [ProcedureParam]
+parseProcedureParams = sepBy parseProcedureParam (char ',')
+
+parseProcedureParam :: Parser ProcedureParam
+parseProcedureParam =
+  ProcedureParam
+    <$ qsWhiteSpace
+    <*> parseIdentifier
+    <* qsWhiteSpace
+    <* string ":"
+    <* qsWhiteSpace
+    <*> parseType
+
+parseProcedureStatement :: Parser CompoundStatement
+parseProcedureStatement =
+  CompoundStatement
+    <$ qsWhiteSpace
+    <* string "BEGIN"
+    <* qsWhiteSpace
+    <*> parseStatements
+    <* qsWhiteSpace
+    <* string "END"
+    <* qsWhiteSpace
+    <* string ";"
+    <* qsWhiteSpace
 
 -- Parsing entire programs
 parseProgram :: Parser Program
-parseProgram = Program <$>
-    (string "PROGRAM" *> 
-     qsWhiteSpace     *>
-     parseIdentifier  <* semicolon <* qsWhiteSpace) <*>
-    parseBlock
+parseProgram =
+  Program
+    <$ qsWhiteSpace
+    <* string "PROGRAM"
+    <* qsWhiteSpace
+    <*> parseIdentifier
+    <* qsWhiteSpace
+    <* semicolon
+    <* qsWhiteSpace
+    <*> parseBlock
+    <* qsWhiteSpace
