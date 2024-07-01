@@ -67,6 +67,12 @@ dotParse = char '.'
 semicolon :: Parser Char
 semicolon = char ';'
 
+bracketR :: Parser Char
+bracketR = char ')'
+
+bracketL :: Parser Char
+bracketL = char '('
+
 -- Parsing compound statements
 parseCompoundStatement :: Parser CompoundStatement
 parseCompoundStatement = CompoundStatement <$>
@@ -142,8 +148,14 @@ parseVar = Var <$> parseIdentifiers <*> (string ":" *>
                                          parseType  <*
                                          semicolon)
 
+parseParameter:: Parser Parameter
+parseParameter = Parameter <$> parseIdentifiers <*> (string *> parseType  <* semicolon)
+
 parseVariables :: Parser [Var]
 parseVariables = parseVar `sepEndBy` qsWhiteSpace
+
+parseVariablesMult :: Parser [Var]
+parseVariablesMult = parseVariablesMult <$> (string "VAR" *> parseParameter)
 
 -- Parsing declarations
 parseDeclaration :: Parser Declaration
@@ -151,9 +163,16 @@ parseDeclaration = Declaration <$> (string "VAR" *>
                                     qsWhiteSpace *>
                                     parseVariables)
 
+parseProcedureDecl :: Parser ProcedureDecl
+parseProcedureDecl = ProcedureDecl <$> parseIdentifier (bracketL *> parseParameter *> bracketR)
+
+parseProcedure :: Parser Procedure
+parseProcedure = Prodedure <$> (string "PROCEDURE" *> parseProcedureDecl <* semicolon)
+
+
 -- Parsing blocks
 parseBlock :: Parser Block
-parseBlock = Block <$> parseDeclaration <*> parseCompoundStatements
+parseBlock = Block <$> parseDeclaration <*> parseProcedure <*> parseCompoundStatements
 
 parseCompoundStatements :: Parser [CompoundStatement]
 parseCompoundStatements = parseCompoundStatement `sepBy`
