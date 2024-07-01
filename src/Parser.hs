@@ -23,6 +23,7 @@ module Parser (
   ,parseProcedure
   ,parseParameter
   ,parseParameterList
+  ,parseProcedureCompoundStatement
 ) where
 
 import AST
@@ -180,6 +181,13 @@ parseProcedure = Procedure <$> (string "PROCEDURE" *> qsWhiteSpace *> parseIdent
                             <*> (string "(" *> parseParameterList <* string ")")
                             <*> (semicolon *> qsWhiteSpace *> parseBlock)
 
+parseProcedureCompoundStatement :: Parser CompoundStatement
+parseProcedureCompoundStatement = CompoundStatement <$>
+    (string "BEGIN"  *>
+     qsWhiteSpace    *>
+     parseStatements <*
+     string "END"    <*
+     semicolon)
 parseParameter :: Parser Parameter
 parseParameter = Parameter <$> parseIdentifier <*> (string ":" *> parseType)
 
