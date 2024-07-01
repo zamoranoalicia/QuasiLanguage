@@ -7,7 +7,7 @@ PROGRAM test;
     BEGIN
         xyz := 2+7;
         cdf := 3+5;
-    END.
+    END;
 BEGIN
     abc := 2+7;
     wvy := 3+5;
