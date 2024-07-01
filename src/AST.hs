@@ -10,6 +10,9 @@ module AST (
   , Term(TermFactor)
   , Factor(Value)
   , Identifier(..)
+  , Procedure(..)
+  , TypeIdentifier(..)
+  , ProcedureBody(..)
 ) where
 
 -- | Represents an entire program.
@@ -35,7 +38,18 @@ data TypeVar = INTEGER
 
 -- | Represents a compound statement consisting of a list of statements.
 data CompoundStatement = CompoundStatement [Statement]
+                       | CompoundProcedureStatement [Procedure]
     deriving (Show, Eq)
+
+data Procedure = Procedure Identifier [TypeIdentifier] ProcedureBody
+                deriving (Show, Eq)
+
+data TypeIdentifier = TypeIdentifier Identifier TypeVar
+                deriving (Show, Eq)
+
+data ProcedureBody = PBody [Declaration]
+                   | PCompoundStatement Statement
+                   deriving (Show, Eq)
 
 -- | Represents a statement, which can be an assignment or an empty statement.
 data Statement = Assign Identifier Expression

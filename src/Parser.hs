@@ -39,12 +39,13 @@ languageDef = emptyDef
     , identStart      = letter
     , identLetter     = alphaNum <|> oneOf "_'"
     , opStart         = opLetter emptyDef
-    , opLetter        = oneOf ":!#$%&*+./<=>?@\\^|-~"
+    , opLetter        = oneOf ":!#$%&*+./<=>?@\\^|-~)("
     , reservedNames   = ["BEGIN"
                          , "END"
                          , "VAR"
                          , "BLOCK"
                          , "PROGRAM"
+                         , "PROCEDURE"
                          , "INTEGER"
                          , "REAL"]
     , reservedOpNames = ["+", "-", "*", "/", ":="
@@ -75,6 +76,34 @@ parseCompoundStatement = CompoundStatement <$>
      parseStatements <*
      string "END"    <*
      dotParse)
+
+parseCompoundProcedureStatement :: Parser CompoundStatement
+parseCompoundProcedureStatement = CompoundProcedureStatement <$> many1 parseProcedureStatement
+
+parseProcedureStatement :: Parser Procedure
+parseProcedureStatement = Procedure <$> 
+                        (string "PROCEDURE" *>
+                         qsWhiteSpace       *>
+                         parseIdentifier)    <*>
+                         parseProcedureParams <*>
+                         (parseProcedureBodyStatement <* semicolon)
+
+parseProcedureBodyStatement :: Parser ProcedureBody
+parseProcedureBodyStatement = PBody <$> many1 parseDeclaration
+
+parseProcedureParams :: Parser [TypeIdentifier]
+parseProcedureParams =
+  char '('
+    *> qsWhiteSpace
+    *> parseTypeIdentifier `sepBy` (qsWhiteSpace *> char ',' <* qsWhiteSpace)
+    <* qsWhiteSpace
+    <* char ')'
+
+parseTypeIdentifier :: Parser TypeIdentifier
+parseTypeIdentifier = TypeIdentifier <$> (parseIdentifier <* qsWhiteSpace) <*> parseType
+
+parseManyTypeIdentifier :: Parser [TypeIdentifier]
+parseManyTypeIdentifier = many1 parseTypeIdentifier
 
 parseStatements :: Parser [Statement]
 parseStatements = parseStatement `sepEndBy` qsWhiteSpace
@@ -153,11 +182,17 @@ parseDeclaration = Declaration <$> (string "VAR" *>
 
 -- Parsing blocks
 parseBlock :: Parser Block
-parseBlock = Block <$> parseDeclaration <*> parseCompoundStatements
+parseBlock = Block <$> parseDeclaration 
+                   <*> parseCompoundStatements 
 
 parseCompoundStatements :: Parser [CompoundStatement]
-parseCompoundStatements = parseCompoundStatement `sepBy`
+parseCompoundStatements = try parseCompoundProcedureStatements
+                            <|> parseCompoundStatement `sepBy`
                                  qsWhiteSpace
+
+parseCompoundProcedureStatements :: Parser [CompoundStatement]
+parseCompoundProcedureStatements = parseCompoundProcedureStatement `sepBy`
+                                        qsWhiteSpace
 
 -- Parsing entire programs
 parseProgram :: Parser Program
