@@ -158,7 +158,9 @@ parseProcedure = do
     string "PROCEDURE"
     _ <- qsWhiteSpace
     procedureName <- parseIdentifier
+    char '('
     variables <- parseVariables
+    char ')'
     semicolon
     blockContent <- parseBlock
     return $ Procedure procedureName variables blockContent
