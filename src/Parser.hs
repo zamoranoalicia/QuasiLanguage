@@ -151,9 +151,38 @@ parseDeclaration = Declaration <$> (string "VAR" *>
                                     qsWhiteSpace *>
                                     parseVariables)
 
+{--
+Question 1: EBNF Definition
+Update the EBNF definition to include the new procedure declaration syntax.
+PROGRAM test;
+VAR
+xyz,abc:INTEGER;
+cdf,wvy :INTEGER;
+PROCEDURE Alpha(a : INTEGER);
+VAR y:INTEGER;
+BEGIN
+y := 1 + 3;
+END;
+BEGIN
+END.BlockWithProcedure <$> parseDeclaration <*> parseCompoundStatements <*> parseProcedure
+1. What changes are necessary in the EBNF to support the declaration of
+multiple variables of the same type? The change is in AST, Parser and interprete.
+2. Provide the updated EBNF definition.
+-}
 -- Parsing blocks
 parseBlock :: Parser Block
 parseBlock = Block <$> parseDeclaration <*> parseCompoundStatements
+             <|> BlockWithProcedure <$> parseDeclaration <*> parseCompoundStatements <*> parseProcedure 
+
+parseProcedure :: Parser [Procedure]
+parseProcedure =  many parseProcedure'
+
+parseProcedure' :: Parser Procedure
+parseProcedure' = Procedure <$> (string "PROCEDURE" *>
+                                 qsWhiteSpace      *>
+                                 parseIdentifier   <*
+                                 semicolon         <*
+                                 qsWhiteSpace) <*> parseBlock
 
 parseCompoundStatements :: Parser [CompoundStatement]
 parseCompoundStatements = parseCompoundStatement `sepBy`
