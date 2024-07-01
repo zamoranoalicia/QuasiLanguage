@@ -1,0 +1,8 @@
+4. List of updates:
+ - parseProcedure for parsing procedure declarations.
+ - parseParameter and parseParameters for parsing procedure parameters.
+ - parseProcedureCall for parsing procedure calls.
+ - Updated parseDeclaration to handle both variable and procedure declarations.
+ - Updated parseStatement to handle procedure calls.
+
+5. To store the new procedure declarations in the symbol table, we need to enhance the SymbolTable to handle procedures, which include the procedure's name, parameter list, and the block of statements associated with the procedure. 

@@ -4,11 +4,13 @@ module AST (
   , Declaration(..)
   , Var(..)
   , TypeVar(..)
+  , Procedure(..)
+  , Parameter(..)
   , CompoundStatement(..)
-  , Statement(Assign,EmptyStatement)
+  , Statement(..)
   , Expression(..)
-  , Term(TermFactor)
-  , Factor(Value)
+  , Term(..)
+  , Factor(..)
   , Identifier(..)
 ) where
 
@@ -17,11 +19,12 @@ data Program = Program Identifier Block
     deriving (Show, Eq)
 
 -- | Represents a block of declarations and compound statements.
-data Block = Block Declaration [CompoundStatement]
+data Block = Block [Declaration] [CompoundStatement]
     deriving (Show, Eq)
 
--- | Represents a declaration consisting of a list of variables.
-data Declaration = Declaration [Var]
+-- | Represents a declaration, which can be a variable or a procedure.
+data Declaration = VarDecl Var
+                 | ProcDecl Procedure
     deriving (Show, Eq)
 
 -- | Represents a variable with a list of identifiers and a type.
@@ -33,13 +36,20 @@ data TypeVar = INTEGER
              | REAL
     deriving (Show, Eq)
 
+data Procedure = Procedure Identifier [Parameter] Block
+    deriving (Show, Eq)
+
+data Parameter = Parameter Identifier TypeVar
+    deriving (Show, Eq)
+
 -- | Represents a compound statement consisting of a list of statements.
 data CompoundStatement = CompoundStatement [Statement]
     deriving (Show, Eq)
 
--- | Represents a statement, which can be an assignment or an empty statement.
+-- | Represents a statement, which can be an assignment, an empty statement, or a procedure call.
 data Statement = Assign Identifier Expression
                | EmptyStatement
+               | ProcCall Identifier [Expression]
     deriving (Show, Eq)
 
 -- | Represents an expression, which can be an addition, subtraction, or a term.
