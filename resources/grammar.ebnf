@@ -5,7 +5,10 @@ block ::= declarations compound_statement
 declarations ::= VAR (variable_declaration SEMI)+
                  | empty
 
-variable_declaration ::= ID (COMMA ID)* COLON type_spec
+variable_declaration ::= multiple_variable COLON type_spec
+
+multiple_variable ::= ID (COMMA ID)* 
+                  | ID (COMMA ID) multiple_variable
 
 type_spec ::= INTEGER | REAL
 
@@ -16,7 +19,17 @@ statement_list ::= statement
 
 statement ::= compound_statement
           | assignment_statement
+          | function_statement
           | empty
+
+function_statement ::= PROCEDURE function_declaration
+
+function_declaration ::= ID (parameter_list)* function_body
+
+parameter_list ::= parameter | parameter SEMI parameter_list
+
+function_body ::= block
+
 
 assignment_statement ::= variable ASSIGN expr
 

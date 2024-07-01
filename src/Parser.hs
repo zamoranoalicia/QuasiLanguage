@@ -80,7 +80,7 @@ parseStatements :: Parser [Statement]
 parseStatements = parseStatement `sepEndBy` qsWhiteSpace
 
 parseStatement :: Parser Statement
-parseStatement = try parseAssignment <|> parseEmpty
+parseStatement = try parseAssignment <|> parseEmpty <|> parseFunction
 
 -- Parsing empty statements (new lines)
 parseNewLine :: Parser Char
@@ -158,6 +158,29 @@ parseBlock = Block <$> parseDeclaration <*> parseCompoundStatements
 parseCompoundStatements :: Parser [CompoundStatement]
 parseCompoundStatements = parseCompoundStatement `sepBy`
                                  qsWhiteSpace
+
+
+parseParam :: Parser Parameter
+parseParam = (Parameter var)
+
+
+parseFunction :: Parser Statement
+parseFunction = do
+  reserved "fun"
+  spaces
+  funcName <- many1 letter
+  exists <- analyzeVar funcName
+  if exists
+    then error ("Function " ++ funcName ++ " ya existe (" ++ show line ++ ", " ++ show column ++ ")")
+    else do
+      -- pushContext (Nuevo contexto local)
+      params <- char '(' *> sepBy1 parseParam (spaces *> char ',' <* spaces) <* char ')'
+      spaces *> char '{' *> spaces
+      body <- parseBlock
+      -- popContext (Se sale del contexto local)
+      let func = Function funcName params body
+      -- Aca se haria el update al symbol table del nombre de la funcion
+      return func
 
 -- Parsing entire programs
 parseProgram :: Parser Program
