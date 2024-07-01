@@ -44,11 +44,11 @@ argument_list ::= expr | expr COMMA argument_list | empty
 
 assignment_statement ::= variable ASSIGN expr
 
-empty ::= 
+empty ::=
 
-expr ::= term ((PLUS | MINUS) term)*
+expr::= term ((PLUS | MINUS) term)*
 
-term ::= factor ((MUL | DIV) factor)*
+term::= factor ((MUL | DIV) factor)*
 
 factor ::= PLUS factor
        | MINUS factor
@@ -56,4 +56,4 @@ factor ::= PLUS factor
        | LPAREN expr RPAREN
        | variable
 
-variable ::= ID
+variable::= ID

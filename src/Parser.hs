@@ -100,7 +100,7 @@ parseEmpty = EmptyStatement <$ parseNewLine
 parseAssignment :: Parser Statement
 parseAssignment = Assign <$> (parseIdentifier   <*
                               parseAssignSymbol <*
-                              qsWhiteSpace) <*> parseExpression
+                              qsWhiteSpace)<*>parseExpression
 
 parseAssignSymbol :: Parser String
 parseAssignSymbol = string ":="
@@ -115,7 +115,7 @@ parseOperation = parsePlus
 parsePlus :: Parser Expression
 parsePlus = Plus <$> (parseTermFactor <*
                       parsePlusSign   <*
-                      qsWhiteSpace) <*> parseTermFactor
+                      qsWhiteSpace)  <*> parseTermFactor
 
 parsePlusSign :: Parser Char
 parsePlusSign = char '+'
