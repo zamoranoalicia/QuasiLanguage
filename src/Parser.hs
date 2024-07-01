@@ -185,10 +185,10 @@ parseVar =
     <*> parseType
     <* qsWhiteSpace
     <* semicolon
-    <* qsWhiteSpace
+    <* endOfLine
 
 parseVariables :: Parser [Var]
-parseVariables = parseVar `sepEndBy` endOfLine
+parseVariables = many parseVar
 
 -- Parsing declarations
 parseDeclaration :: Parser Declaration
@@ -198,7 +198,7 @@ parseDeclaration =
     <* string "VAR"
     <* qsWhiteSpace
     <*> parseVariables
-    <* qsWhiteSpace
+    <* endOfLine
 
 -- Parsing blocks
 parseBlock :: Parser Block
