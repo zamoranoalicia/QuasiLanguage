@@ -32,6 +32,7 @@ interpretStatement (AST.Assign id exp) table = (ST.nameFromIdentifier id, getExp
             in case symbol of
                 Just (ST.Symbol _ _ value) -> (ST.valueFromSymbolValue value)
                 Nothing -> (interpretExpression expression)
+interpretStatement (AST.ProcedureStatement (AST.ProcedureStatement ident params block)) table = table
 interpretStatement (AST.EmptyStatement) _ = ("",0)
 
 interpreCompStatement :: AST.CompoundStatement -> ST.SymbolTable -> [(String, Int)]

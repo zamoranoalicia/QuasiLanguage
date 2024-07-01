@@ -39,7 +39,8 @@ data CompoundStatement = CompoundStatement [Statement]
 
 -- | Represents a statement, which can be an assignment or an empty statement.
 data Statement = Assign Identifier Expression
-               | EmptyStatement
+                | ProcedureStatement
+                | EmptyStatement
     deriving (Show, Eq)
 
 -- | Represents an expression, which can be an addition, subtraction, or a term.
@@ -60,4 +61,12 @@ data Factor = Value Int
 
 -- | Represents an identifier.
 data Identifier = Identifier String
+    deriving (Show, Eq)
+
+-- Update
+
+data ProcedureStatement = ProcedureStatement Identifier [Parameter] Block
+    deriving (Show, Eq)
+
+data Parameter = Parameter Identifier TypeVar
     deriving (Show, Eq)

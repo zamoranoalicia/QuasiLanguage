@@ -23,7 +23,7 @@ data Scope = GLOBAL|
              LOCAL |
              BLOCK deriving (Show,Eq)
 
-data BuiltInType = INTEGER | REAL deriving (Show, Eq)
+data BuiltInType = INTEGER | REAL | PROCEDURE deriving (Show, Eq)
 
 data Symbol = Symbol String BuiltInType SymbolValue deriving (Show, Eq)
 
