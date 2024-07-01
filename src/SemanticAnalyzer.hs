@@ -89,3 +89,5 @@ analyzeCompStatements :: ST.SymbolTable -> [AST.CompoundStatement] -> ST.SymbolT
 analyzeCompStatements = foldl (\table compStmt -> snd (analyzeCompStatement compStmt table))
 
         
+analyzeFunction :: ST.SymbolTable -> [AST.Function] -> ST.SymbolTable
+analyzeFunction function@(AST.Function funcName params body) = funcName (map analyzeVar params) (analyzeStatements body) 
