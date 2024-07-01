@@ -80,26 +80,8 @@ parseStatements :: Parser [Statement]
 parseStatements = parseStatement `sepEndBy` qsWhiteSpace
 
 parseStatement :: Parser Statement
-parseStatement = try parseAssignment <|> parseIf <|> parseWhile <|> parseComment <|> parseEmpty
+parseStatement = try parseAssignment <|> parseEmpty
 
-parseWhile :: Parser Statement
-parseWhile = do
-    _ <- string "WHILE"
-    cond <- parseExpression
-    _ <- string "DO"
-    While cond <$> parseStatement
-
-parseIf :: Parser Statement
-parseIf = do
-    _ <- string "IF"
-    cond <- parseExpression
-    _ <- string "THEN"
-    trueStmt <- parseStatement
-    falseStmt <- optionMaybe (string "ELSE" *> parseStatement)
-    return $ If cond trueStmt falseStmt
-
-parseComment :: Parser Statement
-parseComment = Comment <$> (string "//" *> manyTill anyChar (char '\n'))
 
 -- Parsing empty statements (new lines)
 parseNewLine :: Parser Char
