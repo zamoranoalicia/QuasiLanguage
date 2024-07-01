@@ -162,8 +162,8 @@ parseType =
 
 -- Parsing identifiers
 parseIdentifier :: Parser Identifier
-parseIdentifier 
-    = Identifier 
+parseIdentifier
+    = Identifier
     <$ qsWhiteSpace
     <*> qlIdentifier
     <* qsWhiteSpace
@@ -188,7 +188,7 @@ parseVar =
     <* qsWhiteSpace
 
 parseVariables :: Parser [Var]
-parseVariables = parseVar `sepEndBy` (char '\n')
+parseVariables = parseVar `sepEndBy` newline
 
 -- Parsing declarations
 parseDeclaration :: Parser Declaration
