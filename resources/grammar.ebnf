@@ -5,6 +5,8 @@ block ::= declarations compound_statement
 declarations ::= VAR (variable_declaration SEMI)+
                  | empty
 
+function_declarations ::= PROCEDURE ID (variable_declaration)* block
+
 variable_declaration ::= ID (COMMA ID)* COLON type_spec
 
 type_spec ::= INTEGER | REAL
