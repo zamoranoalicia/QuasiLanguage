@@ -1,6 +1,16 @@
 program ::= PROGRAM ID SEMI block DOT
 
-block ::= declarations compound_statement
+block ::= declarations procedure_declaration compound_statement
+
+procedure_declaration ::= PROCEDURE name_function_declaration (parameters)* body
+
+parameters ::= ID type_spec
+
+body ::= VAR (ID type_spec)+ body_function
+
+body_function ::= BEGIN ID expr END
+
+name_function_declaration ::= ID 
 
 declarations ::= VAR (variable_declaration SEMI)+
                  | empty
