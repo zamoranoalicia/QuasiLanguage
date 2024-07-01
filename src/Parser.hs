@@ -188,7 +188,7 @@ parseVar =
     <* qsWhiteSpace
 
 parseVariables :: Parser [Var]
-parseVariables = parseVar `sepEndBy` newline
+parseVariables = parseVar `sepEndBy` endOfLine
 
 -- Parsing declarations
 parseDeclaration :: Parser Declaration
@@ -198,7 +198,6 @@ parseDeclaration =
     <* string "VAR"
     <* qsWhiteSpace
     <*> parseVariables
-    <* qsWhiteSpace
     <* qsWhiteSpace
 
 -- Parsing blocks
