@@ -20,6 +20,10 @@ module Parser (
   , parseDeclaration
   , parseBlock
   , parseProgram
+  ,parseProcedure
+  ,parseParameter
+  ,parseParameterList
+  ,parseProcedureCompoundStatement
 ) where
 
 import AST
@@ -185,3 +189,27 @@ parseProgram = Program <$>
      qsWhiteSpace     *>
      parseIdentifier  <* semicolon <* qsWhiteSpace) <*>
     parseBlock
+
+{-List: parseProcedure
+        parseParameter
+        parseParameterList
+        -}
+
+parseProcedure :: Parser Procedure
+parseProcedure = Procedure <$> (string "PROCEDURE" *> qsWhiteSpace *> parseIdentifier)
+                            <*> (string "(" *> parseParameterList <* string ")")
+                            <*> (semicolon *> qsWhiteSpace *> parseBlock)
+
+parseProcedureCompoundStatement :: Parser CompoundStatement
+parseProcedureCompoundStatement = CompoundStatement <$>
+    (string "BEGIN"  *>
+     qsWhiteSpace    *>
+     parseStatements <*
+     string "END"    <*
+     semicolon)
+parseParameter :: Parser Parameter
+parseParameter = Parameter <$> parseIdentifier <*> (string ":" *> parseType)
+
+parseParameterList :: Parser [Parameter]
+parseParameterList = parseParameter `sepBy` (char ',' *> qsWhiteSpace)
+

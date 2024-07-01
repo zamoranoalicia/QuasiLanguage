@@ -10,6 +10,8 @@ module AST (
   , Term(TermFactor)
   , Factor(Value)
   , Identifier(..)
+  ,Procedure(..)
+  ,Parameter(..)
 ) where
 import Data.IntMap.Merge.Lazy (SimpleWhenMatched)
 
@@ -73,4 +75,10 @@ data Factor = Value Int
 
 -- | Represents an identifier.
 data Identifier = Identifier String
+    deriving (Show, Eq)
+    
+data Procedure = Procedure Identifier [Parameter] Block
+    deriving (Show, Eq)
+
+data Parameter = Parameter Identifier TypeVar
     deriving (Show, Eq)

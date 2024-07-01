@@ -25,7 +25,9 @@ data Scope = GLOBAL|
 
 data BuiltInType = INTEGER | REAL deriving (Show, Eq)
 
-data Symbol = Symbol String BuiltInType SymbolValue deriving (Show, Eq)
+data Symbol = VariableSymbol String BuiltInType SymbolValue
+            | ProcedureSymbol String [AST.Parameter]
+            deriving (Show, Eq)
 
 data SymbolValue = SymbolValue Int deriving(Show, Eq)
 

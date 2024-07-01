@@ -43,3 +43,6 @@ interpretBlock block@(AST.Block declaration compStatements) table = updatedTable
                 updatedTable block table =
                     let (blockNode, newTable) = (SA.analyzeBlock block table)
                     in map (`interpreCompStatement` newTable) compStatements
+
+interpretProcedure :: AST.Procedure -> ST.SymbolTable -> [[(String, Int)]]
+interpretProcedure (AST.Procedure _ _ block) table = interpretBlock block table
