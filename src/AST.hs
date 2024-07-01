@@ -5,10 +5,11 @@ module AST (
   , Var(..)
   , TypeVar(..)
   , CompoundStatement(..)
-  , Statement(Assign,EmptyStatement)
+  , Statement(Assign,EmptyStatement,Function)
   , Expression(..)
   , Term(TermFactor)
   , Factor(Value)
+  , Parameter(..)
   , Identifier(..)
 ) where
 
@@ -37,9 +38,13 @@ data TypeVar = INTEGER
 data CompoundStatement = CompoundStatement [Statement]
     deriving (Show, Eq)
 
+data Parameter = Parameter Identifier
+    deriving (Show, Eq)
+
 -- | Represents a statement, which can be an assignment or an empty statement.
 data Statement = Assign Identifier Expression
                | EmptyStatement
+               | Function String [Parameter] Block
     deriving (Show, Eq)
 
 -- | Represents an expression, which can be an addition, subtraction, or a term.
