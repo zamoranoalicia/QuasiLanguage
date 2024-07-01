@@ -88,4 +88,5 @@ analyzeBlock block@(AST.Block declaration compStatements) symbolTable =
 analyzeCompStatements :: ST.SymbolTable -> [AST.CompoundStatement] -> ST.SymbolTable
 analyzeCompStatements = foldl (\table compStmt -> snd (analyzeCompStatement compStmt table))
 
-        
+{- analyzeProcedure :: AST.Procedure -> ST.SymbolTable -> (AST.Procedure, ST.SymbolTable)
+analyzeProcedure procedure@(AST.Procedure identifier block) symbolTable =  -}
