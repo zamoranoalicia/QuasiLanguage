@@ -1,0 +1,6 @@
+1. What changes are necessary in the EBNF to support the declaration of
+multiple variables of the same type?
+Es necesario añadir en Block el Procedure , tambien es necesario crear uan nueva regla Procedure la cual tendra un identificador un var y un COMMAompount STatement
+
+2. Provide the updated EBNF definition.
+en el archvio de grammar_BNF

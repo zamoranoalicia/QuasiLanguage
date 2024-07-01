@@ -46,7 +46,8 @@ languageDef = emptyDef
                          , "BLOCK"
                          , "PROGRAM"
                          , "INTEGER"
-                         , "REAL"]
+                         , "REAL"
+                         , "PROCEDURE"]
     , reservedOpNames = ["+", "-", "*", "/", ":="
                          , "==", "<", ">", "<=", ">="]
     , caseSensitive   = True
@@ -66,6 +67,12 @@ dotParse = char '.'
 
 semicolon :: Parser Char
 semicolon = char ';'
+
+parenthesesOpen :: Parser Char
+parenthesesOpen = char '(' 
+
+parenthesesClosed :: Parser Char
+parenthesesClosed = char ')'
 
 -- Parsing compound statements
 parseCompoundStatement :: Parser CompoundStatement
@@ -153,7 +160,7 @@ parseDeclaration = Declaration <$> (string "VAR" *>
 
 -- Parsing blocks
 parseBlock :: Parser Block
-parseBlock = Block <$> parseDeclaration <*> parseCompoundStatements
+parseBlock = Block <$> parseDeclaration <*> parseProcedure <*> parseCompoundStatements
 
 parseCompoundStatements :: Parser [CompoundStatement]
 parseCompoundStatements = parseCompoundStatement `sepBy`
@@ -166,3 +173,16 @@ parseProgram = Program <$>
      qsWhiteSpace     *>
      parseIdentifier  <* semicolon <* qsWhiteSpace) <*>
     parseBlock
+
+
+-- Parsing entire procedure
+parseProcedure :: Parser Procedure
+parseProcedure = AST.Procedure <$>
+    (string "PROCEDURE" *> 
+     qsWhiteSpace     *>
+     parseIdentifier  <* parenthesesOpen <* qsWhiteSpace) <*> (parseParameters  <* parenthesesClosed <* qsWhiteSpace) <*> parseCompoundStatement
+
+
+parseParameters :: Parser Parameters
+parseParameters = Parameters <$> parseIdentifiers <*> (string ":" *>
+                                         parseType)

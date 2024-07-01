@@ -1,8 +1,8 @@
-module SemanticAnalyzer(analyzeVar
+ module SemanticAnalyzer(analyzeVar
                       , analyzeDecl
                       , analyzeStatement
                       , analyzeCompStatement
-                      , analyzeBlock
+                      
                       ) where
 
 import qualified SymbolTable as ST
@@ -78,14 +78,14 @@ analyzeCompStatement compound@(AST.CompoundStatement statements) symbolTable =
   
 analyzeStatements :: ST.SymbolTable -> [AST.Statement] -> ST.SymbolTable
 analyzeStatements = foldl (\table stmt -> snd (analyzeStatement stmt table))
-
+{-
 analyzeBlock :: AST.Block -> ST.SymbolTable -> (AST.Block, ST.SymbolTable)
 analyzeBlock block@(AST.Block declaration compStatements) symbolTable = 
     (block, analyzeCompStatements updatedSymbolTable compStatements)
   where
     updatedSymbolTable = snd (analyzeDecl declaration symbolTable)
-
+-}
 analyzeCompStatements :: ST.SymbolTable -> [AST.CompoundStatement] -> ST.SymbolTable
 analyzeCompStatements = foldl (\table compStmt -> snd (analyzeCompStatement compStmt table))
 
-        
+      
