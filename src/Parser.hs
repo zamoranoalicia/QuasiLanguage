@@ -169,7 +169,7 @@ parseProgram = Program <$>
     parseBlock
 
 parseProcedure :: Parser Procedure
-parseProcedure = Procedure <$> 
-                (string "PROCEDURE" *>
-                qsWhiteSpace *>
-                )
+parseProcedure = Procedure <$> (string "PROCEDURE" *> qsWhiteSpace *> identifierTypeVar)
+
+identifierTypeVar :: Parser IdentifierTypeVar
+identifierTypeVar = IdentifierTypeVar 

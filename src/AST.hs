@@ -10,6 +10,9 @@ module AST (
   , Term(TermFactor)
   , Factor(Value)
   , Identifier(..)
+  , Procedure(..)
+  , IdentifierTypeVar(..)
+  , CompoundStatementProcedure(..)
 ) where
 
 -- | Represents an entire program.
