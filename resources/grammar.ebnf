@@ -1,6 +1,6 @@
 program ::= PROGRAM ID SEMI block DOT
 
-block ::= declarations compound_statement
+block ::= declarations compound_statement 
 
 declarations ::= VAR (variable_declaration SEMI)+
                  | empty
@@ -9,7 +9,7 @@ variable_declaration ::= ID (COMMA ID)* COLON type_spec
 
 type_spec ::= INTEGER | REAL
 
-compound_statement ::= BEGIN statement_list END
+compound_statement ::= BEGIN statement_list (procedure)? END
 
 statement_list ::= statement
                | statement SEMI statement_list
@@ -33,3 +33,5 @@ factor ::= PLUS factor
        | variable
 
 variable::= ID
+
+procedure ::= ID declarations block 
