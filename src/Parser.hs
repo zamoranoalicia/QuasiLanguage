@@ -153,7 +153,19 @@ parseDeclaration = Declaration <$> (string "VAR" *>
 
 -- Parsing blocks
 parseBlock :: Parser Block
-parseBlock = Block <$> parseDeclaration <*> parseCompoundStatements
+parseBlock = Block <$> parseDeclaration <*> parseProcedure <*> parseCompoundStatements
+
+parseProcedure :: Parser Procedure
+parseProcedure = Procedure <$> (string "PROCEDURE" *> parseIdentifier) <*> (many parserParameters <* char ';') <*> parseBody
+
+parserParameters :: Parser Parameter
+parserParameters = Parameter <$> parseIdentifier <*> parseType
+
+parseBody :: Parser Body
+parseBody = Body <$> many parseBodyDeclaration <*> (string "BEGIN" *> parseIdentifier) <*> (parseExpression <* semicolon <* string "END" <* semicolon)
+
+parseBodyDeclaration :: Parser BodyDeclaration
+parseBodyDeclaration = BodyDeclaration <$> (string "VAR" *> parseIdentifier <* parseAssignSymbol) <*> (parseType <* semicolon)
 
 parseCompoundStatements :: Parser [CompoundStatement]
 parseCompoundStatements = parseCompoundStatement `sepBy`
