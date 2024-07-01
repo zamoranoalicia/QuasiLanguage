@@ -82,6 +82,22 @@ parseStatements = parseStatement `sepEndBy` qsWhiteSpace
 parseStatement :: Parser Statement
 parseStatement = try parseAssignment <|> parseEmpty
 
+-- parseProcedures :: Parser [Procedure]
+-- parseProcedures = parseProcedure `sepEndBy` qsWhiteSpace
+
+parseProcedure :: Parser Procedure
+parseProcedure = Procedure <$> (parseIdentifier <* qsWhiteSpace <*
+    char '('       <*
+    qsWhiteSpace     <*
+    parseExpression <*
+    qsWhiteSpace     <*
+    char ')'       <*
+    qsWhiteSpace     <*
+    semicolon
+    )<*> parseBlock
+        
+
+
 -- Parsing empty statements (new lines)
 parseNewLine :: Parser Char
 parseNewLine = char '\n' <|> char '\r' <|> char '\t'
