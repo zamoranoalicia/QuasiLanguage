@@ -46,7 +46,8 @@ languageDef = emptyDef
                          , "BLOCK"
                          , "PROGRAM"
                          , "INTEGER"
-                         , "REAL"]
+                         , "REAL"
+                         , "PROCEDURE"]
     , reservedOpNames = ["+", "-", "*", "/", ":="
                          , "==", "<", ">", "<=", ">="]
     , caseSensitive   = True

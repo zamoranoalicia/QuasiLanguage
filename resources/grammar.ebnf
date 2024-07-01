@@ -1,11 +1,19 @@
 program ::= PROGRAM ID SEMI block DOT
 
-block ::= declarations compound_statement
+block ::= declarations procedure compound_statement 
 
 declarations ::= VAR (variable_declaration SEMI)+
                  | empty
 
 variable_declaration ::= ID (COMMA ID)* COLON type_spec
+
+procedure ::= PROCEDURE (procedure_declaration SEMI)
+
+procedure_declaration ::= ID (procedure_entry) blockProcedure SEMI
+
+procedure_entry::= ID COLON type_spec
+
+blockProcedure ::= declarations compound_statement
 
 type_spec ::= INTEGER | REAL
 

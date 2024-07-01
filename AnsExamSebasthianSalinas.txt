@@ -1,0 +1,10 @@
+Q1
+1.- What changes are necessary in the EBNF to support the declaration of multiple variables of the same type?
+En el EBNF lo que vi necesario añadir es una como tal un procedure que siga su declaracion que es que tenga la estructura de palabra reservada Procedure y tambien agregar un bloque para Procedure ya que puede contener tanto declaraciones como tambien compound statements
+
+Q2
+
+Subi un archivo que me genero el railroad 
+
+Q3
+1.- al Ast le agregue un Procedure con la entrda que necesita y creando el nuevo bloque del procedure para que pueda usarse y le añadi el Procedure dentro del bloque para que lo pueda reconocer 
