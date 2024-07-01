@@ -20,6 +20,10 @@ module Parser (
   , parseDeclaration
   , parseBlock
   , parseProgram
+  , parseProcedure
+  , parseParameter
+  , parseParameters
+  , parseProcedureCall
 ) where
 
 import AST
@@ -43,7 +47,7 @@ languageDef = emptyDef
     , reservedNames   = ["BEGIN"
                          , "END"
                          , "VAR"
-                         , "BLOCK"
+                         , "PROCEDURE"
                          , "PROGRAM"
                          , "INTEGER"
                          , "REAL"]
@@ -77,10 +81,10 @@ parseCompoundStatement = CompoundStatement <$>
      dotParse)
 
 parseStatements :: Parser [Statement]
-parseStatements = parseStatement `sepEndBy` qsWhiteSpace
+parseStatements = parseStatement sepEndBy qsWhiteSpace
 
 parseStatement :: Parser Statement
-parseStatement = try parseAssignment <|> parseEmpty
+parseStatement = try parseAssignment <|> try parseProcedureCall <|> parseEmpty
 
 -- Parsing empty statements (new lines)
 parseNewLine :: Parser Char
@@ -133,7 +137,7 @@ parseIdentifier :: Parser Identifier
 parseIdentifier = Identifier <$> qlIdentifier
 
 parseIdentifiers :: Parser [Identifier]
-parseIdentifiers = parseIdentifier `sepBy` 
+parseIdentifiers = parseIdentifier sepBy 
                     (char ',' *> qsWhiteSpace)
 
 -- Parsing variables
@@ -143,21 +147,42 @@ parseVar = Var <$> parseIdentifiers <*> (string ":" *>
                                          semicolon)
 
 parseVariables :: Parser [Var]
-parseVariables = parseVar `sepEndBy` qsWhiteSpace
+parseVariables = parseVar sepEndBy qsWhiteSpace
 
 -- Parsing declarations
 parseDeclaration :: Parser Declaration
-parseDeclaration = Declaration <$> (string "VAR" *>
-                                    qsWhiteSpace *>
-                                    parseVariables)
+parseDeclaration = try (VarDecl <$> parseVarDeclaration)
+               <|> (ProcDecl <$> parseProcedure)
+
+parseVarDeclaration :: Parser Var
+parseVarDeclaration = string "VAR" *> qsWhiteSpace *> parseVar
+
+-- Parsing procedure declarations
+parseProcedure :: Parser Procedure
+parseProcedure = Procedure <$> (string "PROCEDURE" *> qsWhiteSpace *> parseIdentifier)
+                           <> (char '(' *> parseParameters < char ')')
+                           <> (semicolon *> qsWhiteSpace *> parseBlock < semicolon)
+
+-- Parsing procedure parameters
+parseParameter :: Parser Parameter
+parseParameter = Parameter <$> parseIdentifier <*> (char ':' *> parseType)
+
+parseParameters :: Parser [Parameter]
+parseParameters = parseParameter sepBy (char ',' *> qsWhiteSpace)
+
+-- Parsing procedure calls
+parseProcedureCall :: Parser Statement
+parseProcedureCall = ProcCall <$> parseIdentifier <> (char '(' *> parseArguments < char ')')
+
+parseArguments :: Parser [Expression]
+parseArguments = parseExpression sepBy (char ',' *> qsWhiteSpace)
 
 -- Parsing blocks
 parseBlock :: Parser Block
-parseBlock = Block <$> parseDeclaration <*> parseCompoundStatements
+parseBlock = Block <$> many parseDeclaration <*> parseCompoundStatements
 
 parseCompoundStatements :: Parser [CompoundStatement]
-parseCompoundStatements = parseCompoundStatement `sepBy`
-                                 qsWhiteSpace
+parseCompoundStatements = parseCompoundStatement sepBy qsWhiteSpace
 
 -- Parsing entire programs
 parseProgram :: Parser Program
