@@ -19,6 +19,25 @@ import qualified AST as AST
 
 type SymbolTable = Map.Map String Symbol
 
+type ProcedureTable = Map.Map String ProcedureSymbol
+
+data ProcedureSymbol = Procedure String  
+
+insertProcedureSymbol :: String -> ProcedureSymbol -> ProcedureTable -> ProcedureTable
+insertProcedureSymbol name procedure procedureTable = Map.insert name procedure procedureTable
+
+lookupProcedureSymbol :: String -> ProcedureTable -> Maybe ProcedureSymbol
+lookupProcedureSymbol name table = Map.lookup name table
+
+deleteProcedureSymbol :: String -> ProcedureTable -> ProcedureTable
+deleteProcedureSymbol name procedureTable = Map.delete name procedureTable
+
+valueFromProcedureValue :: ProcedureSymbol -> String
+valueFromProcedureValue (Procedure v) = v
+
+nameFromProcedure :: AST.Procedure -> String 
+nameFromProcedure (name _ _) = nameFromIdentifier name
+
 data Scope = GLOBAL|
              LOCAL |
              BLOCK deriving (Show,Eq)

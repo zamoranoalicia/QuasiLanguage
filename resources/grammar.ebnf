@@ -1,6 +1,14 @@
 program ::= PROGRAM ID SEMI block DOT
 
-block ::= declarations compound_statement
+-- My changes
+-- Question1: is it necessary to change block to put procedure and create the definition of procedure with a modified block called procedure_block
+block ::= declarations (procedure) compound_statement
+
+procedure ::= PROCEDURE ID (variable_declaration) SEMI procedure_block SEMI
+
+procedure_block ::= declarations compound_statement
+
+--
 
 declarations ::= VAR (variable_declaration SEMI)+
                  | empty

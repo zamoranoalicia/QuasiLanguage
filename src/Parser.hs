@@ -46,7 +46,8 @@ languageDef = emptyDef
                          , "BLOCK"
                          , "PROGRAM"
                          , "INTEGER"
-                         , "REAL"]
+                         , "REAL"
+                         , "PROCEDURE"]
     , reservedOpNames = ["+", "-", "*", "/", ":="
                          , "==", "<", ">", "<=", ">="]
     , caseSensitive   = True
@@ -151,9 +152,31 @@ parseDeclaration = Declaration <$> (string "VAR" *>
                                     qsWhiteSpace *>
                                     parseVariables)
 
+-- Parsing procedure 
+
+parseProcedures :: Parser [Procedure]
+parseProcedures = parseProcedure 'sepEndBy' parseNewLine
+
+parseProcedure :: Parser Procedure
+parseProcedure = Procedure <$> ( string "PROCEDURE" *>
+                                 parseIdentifier) <*> 
+                                 (string "(" *> parseVariables <* string ")" <* semicolon) <*>
+                                 parseProcedureBlock
+
+parseProcedureBlock :: Parser ProcedureBlock
+parseProcedureBlock = ProcedureBlock <$> parseDeclaration <*> parseProcedureCompoundStatement
+
+parseProcedureCompoundStatement :: Parser CompoundStatement
+parseProcedureCompoundStatement = CompoundStatement <$>
+    (string "BEGIN"  *>
+     qsWhiteSpace    *>
+     parseStatements <*
+     string "END"    <*
+     semicolon)
+
 -- Parsing blocks
 parseBlock :: Parser Block
-parseBlock = Block <$> parseDeclaration <*> parseCompoundStatements
+parseBlock = Block <$> parseDeclaration <*> parseProcedures <*> parseCompoundStatements
 
 parseCompoundStatements :: Parser [CompoundStatement]
 parseCompoundStatements = parseCompoundStatement `sepBy`
