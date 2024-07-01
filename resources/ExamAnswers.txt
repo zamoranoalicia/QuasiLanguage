@@ -1,0 +1,10 @@
+Answer4
+R: el parser de Procedures de Param y crear un compound statement propio dada la diferencia de la terminacion de . por  ;
+
+Answer5
+R: Para implementar la funcion de deteccion dentro del Procedure por que si bien si va detectar
+el procedure permite manejar variables locales que solo viven dentro de el como ser el caso de y o del parametro a,
+entonces ese detalle debe ser agregado al Symbol table para su analisis en el analizador semantico
+
+Answer6
+R: Seria usar lo nuevo creado en la respuesta del 5, analizar que esas variables sean locales ya que son propias del procedure

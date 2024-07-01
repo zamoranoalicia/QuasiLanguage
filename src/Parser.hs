@@ -80,7 +80,10 @@ parseStatements :: Parser [Statement]
 parseStatements = parseStatement `sepEndBy` qsWhiteSpace
 
 parseStatement :: Parser Statement
-parseStatement = try parseAssignment <|> parseEmpty
+parseStatement = try parseAssignment <|> parseStProcedure <|> parseEmpty
+
+parseStProcedure :: Parser Statement
+parseStProcedure = StProcedure <$> parseProcedure
 
 -- Parsing empty statements (new lines)
 parseNewLine :: Parser Char
@@ -103,7 +106,36 @@ parseExpression :: Parser Expression
 parseExpression = parseOperation <* semicolon
 
 parseOperation :: Parser Expression
-parseOperation = parsePlus
+parseOperation = try parsePlus
+                <|> try parseMinus
+                <|> parseEterm
+
+parseEterm :: Parser Expression
+parseEterm = try (ETerm <$> parseMul) 
+            <|> ETerm <$> parseDiv
+
+-- In order to parse PROCEDURES  i think we need a parse for PROCEDURE, and Param
+parseProcedure :: Parser Func_Procedure
+parseProcedure = Procedure <$> parseIdentifier <*> parseParam <*> parseProcCompoundStatement
+
+-- Compound Statement for Procedure but semicolon at the end
+parseProcCompoundStatement :: Parser CompoundStatement
+parseProcCompoundStatement = CompoundStatement <$>
+    (string "BEGIN"  *>
+     qsWhiteSpace    *>
+     parseStatements <*
+     string "END"    <*
+     semicolon)
+
+-- Parser of Params
+parseParam :: Parser Param
+parseParam = try ( Param <$> (char '(' *> parseDeclaration <* char ')'))
+
+parseMul :: Parser Term
+parseMul = Mul <$> (parseFactor <* char '*' <* qsWhiteSpace)<*> parseFactor
+
+parseDiv :: Parser Term
+parseDiv = Div <$> (parseFactor <* char '/' <* qsWhiteSpace)<*> parseFactor
 
 parsePlus :: Parser Expression
 parsePlus = Plus <$> (parseTermFactor <*
@@ -112,6 +144,9 @@ parsePlus = Plus <$> (parseTermFactor <*
 
 parsePlusSign :: Parser Char
 parsePlusSign = char '+'
+
+parseMinus :: Parser Expression
+parseMinus = Minus <$> (parseTermFactor <* char '-' <* qsWhiteSpace) <*> parseTermFactor
 
 -- Parsing terms and factors
 parseTermFactor :: Parser Term

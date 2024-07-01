@@ -5,11 +5,13 @@ module AST (
   , Var(..)
   , TypeVar(..)
   , CompoundStatement(..)
-  , Statement(Assign,EmptyStatement)
+  , Statement(Assign,EmptyStatement,StProcedure)
   , Expression(..)
-  , Term(TermFactor)
+  , Term(TermFactor,Mul,Div)
   , Factor(Value)
   , Identifier(..)
+  ,Func_Procedure(Procedure)
+  ,Param(Param,EmptyParam)
 ) where
 
 -- | Represents an entire program.
@@ -33,12 +35,23 @@ data TypeVar = INTEGER
              | REAL
     deriving (Show, Eq)
 
+
+-- Im adding the method Procedure that has his identifier, de ID of the method, the params and the block of code
+data Func_Procedure = Procedure Identifier Param CompoundStatement
+                    deriving(Eq, Show)
+
+-- Param allow Declaration because its already a lists  of Var and EmptyParam to represent emtpy params for the method
+data Param = Param Declaration
+            |EmptyParam
+            deriving(Eq,Show)
+
 -- | Represents a compound statement consisting of a list of statements.
 data CompoundStatement = CompoundStatement [Statement]
     deriving (Show, Eq)
 
 -- | Represents a statement, which can be an assignment or an empty statement.
 data Statement = Assign Identifier Expression
+               | StProcedure Func_Procedure
                | EmptyStatement
     deriving (Show, Eq)
 
