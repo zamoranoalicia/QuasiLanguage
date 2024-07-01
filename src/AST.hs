@@ -25,7 +25,10 @@ data Block = Block Declaration [Procedure] [CompoundStatement]
 -- | Represents a procedure 
 -- | It is necessary to add these 2 new definitions and add procedure to block to be able to instantiate it
 data Procedure = Procedure Identifier [Var] ProcedureBlock
+
 data ProcedureBlock = ProcedureBlock Declaration CompoundStatement
+
+data ProcedureCompoundStatement = ProcedureCompoundStatement
 
 -- | Represents a declaration consisting of a list of variables.
 data Declaration = Declaration [Var]
