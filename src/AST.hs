@@ -10,6 +10,7 @@ module AST (
   , Term(TermFactor)
   , Factor(Value)
   , Identifier(..)
+  , Procedure(..)
 ) where
 
 -- | Represents an entire program.
@@ -17,7 +18,7 @@ data Program = Program Identifier Block
     deriving (Show, Eq)
 
 -- | Represents a block of declarations and compound statements.
-data Block = Block Declaration [CompoundStatement]
+data Block = Block Declaration Procedure [CompoundStatement]
     deriving (Show, Eq)
 
 -- | Represents a declaration consisting of a list of variables.
@@ -28,6 +29,12 @@ data Declaration = Declaration [Var]
 data Var = Var [Identifier] TypeVar
     deriving (Show, Eq)
 
+data Procedure  = Procedure Identifier Parameters CompoundStatement
+    deriving (Show , Eq)
+
+data Parameters = Parameters [Identifier] TypeVar
+    deriving (Show, Eq)
+ 
 -- | Represents the type of a variable, which can be INTEGER or REAL.
 data TypeVar = INTEGER
              | REAL
@@ -39,6 +46,7 @@ data CompoundStatement = CompoundStatement [Statement]
 
 -- | Represents a statement, which can be an assignment or an empty statement.
 data Statement = Assign Identifier Expression
+               | Procedures Procedure
                | EmptyStatement
     deriving (Show, Eq)
 
