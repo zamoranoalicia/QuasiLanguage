@@ -3,9 +3,16 @@ program ::= PROGRAM ID SEMI block DOT
 block ::= declarations compound_statement
 
 declarations ::= VAR (variable_declaration SEMI)+
+                 | (procedure_declaration SEMI)+
                  | empty
 
 variable_declaration ::= ID (COMMA ID)* COLON type_spec
+
+procedure_declaration ::= PROCEDURE ID LPAREN (parameter_list)? RPAREN SEMI block
+
+parameter_list ::= parameter (COMMA parameter)*
+
+parameter ::= ID COLON type_spec
 
 type_spec ::= INTEGER | REAL
 
