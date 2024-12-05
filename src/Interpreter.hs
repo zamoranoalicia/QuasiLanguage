@@ -37,9 +37,13 @@ interpretStatement (AST.EmptyStatement) _ = ("",0)
 interpreCompStatement :: AST.CompoundStatement -> ST.SymbolTable -> [(String, Int)]
 interpreCompStatement (AST.CompoundStatement stmts) table = map (`interpretStatement` table) stmts
 
+interpretProcedure :: AST.Procedure -> ST.SymbolTable -> (String, Int)
+interpretProcedure (AST.Procedure id block) table = ("", 0) 
+
 interpretBlock :: AST.Block -> ST.SymbolTable -> [[(String, Int)]]
-interpretBlock block@(AST.Block declaration compStatements) table = updatedTable block table
+interpretBlock block@(AST.Block declaration compStatements) table = updatedTable block table 
             where
                 updatedTable block table =
                     let (blockNode, newTable) = (SA.analyzeBlock block table)
                     in map (`interpreCompStatement` newTable) compStatements
+                    

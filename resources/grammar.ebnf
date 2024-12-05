@@ -1,6 +1,7 @@
 program ::= PROGRAM ID SEMI block DOT
 
 block ::= declarations compound_statement
+          | procedure ID SEMI declarations compound_statement
 
 declarations ::= VAR (variable_declaration SEMI)+
                  | empty

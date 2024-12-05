@@ -2,6 +2,7 @@ module AST (
     Program(..)
   , Block(..)
   , Declaration(..)
+  , Procedure(..)
   , Var(..)
   , TypeVar(..)
   , CompoundStatement(..)
@@ -18,6 +19,11 @@ data Program = Program Identifier Block
 
 -- | Represents a block of declarations and compound statements.
 data Block = Block Declaration [CompoundStatement]
+             | BlockWithProcedure Declaration [CompoundStatement] [Procedure]
+    deriving (Show, Eq)
+
+-- | Represents a procedure declaration.
+data Procedure = Procedure Identifier Block
     deriving (Show, Eq)
 
 -- | Represents a declaration consisting of a list of variables.

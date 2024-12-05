@@ -29,6 +29,11 @@ data Symbol = Symbol String BuiltInType SymbolValue deriving (Show, Eq)
 
 data SymbolValue = SymbolValue Int deriving(Show, Eq)
 
+data Procedure = Procedure String AST.Block deriving (Show, Eq)
+
+processProcedure :: Procedure -> SymbolTable -> SymbolTable
+processProcedure (Procedure name block) symbolTable = insertSymbol name (Symbol name (builtInTypeFromType AST.INTEGER) (SymbolValue 0)) symbolTable
+
 insertSymbol :: String -> Symbol -> SymbolTable -> SymbolTable
 insertSymbol name symbol symbolTable = Map.insert name symbol symbolTable
 
